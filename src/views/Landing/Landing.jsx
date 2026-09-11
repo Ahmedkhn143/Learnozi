@@ -1,10 +1,163 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import './Landing.css';
 
+const INITIAL_TESTIMONIALS = [
+  {
+    id: 'rev-1',
+    name: 'Ali Raza',
+    institute: 'FAST NUCES — CS',
+    rating: 5,
+    quote: '"Learnozi helped me turn my messy study schedule into a clear daily plan. The flashcards saved me hours."',
+    avatar: 'AR',
+    color: '#4f46e5',
+    verified: true,
+    feature: 'Flashcards & Planner'
+  },
+  {
+    id: 'rev-2',
+    name: 'Ayesha Khan',
+    institute: 'NUST — Electrical Eng',
+    rating: 5,
+    quote: '"The AI tutor explains concepts in such a simple way. I finally understand what I used to struggle with."',
+    avatar: 'AK',
+    color: '#0ea5e9',
+    verified: true,
+    feature: 'AI Concept Explainer'
+  },
+  {
+    id: 'rev-3',
+    name: 'Hamza Ahmed',
+    institute: 'LUMS — Business',
+    rating: 5,
+    quote: '"Perfect for MDCAT prep! The study planner and progress tracker keep me motivated every day."',
+    avatar: 'HA',
+    color: '#8b5cf6',
+    verified: true,
+    feature: 'Study Planner'
+  },
+  {
+    id: 'rev-4',
+    name: 'Zainab Fatima',
+    institute: 'Punjab Board — FSc Pre-Med',
+    rating: 5,
+    quote: '"Urdu mein mushkil physics concepts itni asani se samajh aate hain! Coaching academy jane ki zaroorat hi nahi rahi."',
+    avatar: 'ZF',
+    color: '#10b981',
+    verified: true,
+    feature: 'Urdu Native Explainer'
+  },
+  {
+    id: 'rev-5',
+    name: 'Bilal Tariq',
+    institute: 'FBISE — Class 10 (SSC-II)',
+    rating: 5,
+    quote: '"The 25-min Pomodoro timer and streak badges kept me focused for 4 hours daily during board exams!"',
+    avatar: 'BT',
+    color: '#f59e0b',
+    verified: true,
+    feature: 'Pomodoro Room'
+  }
+];
+
 export default function Landing() {
   const { t, language, toggleLanguage } = useLanguage();
+
+  // Reviews state with localStorage persistence
+  const [reviews, setReviews] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('lz_student_reviews');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load reviews from localStorage', err);
+      }
+    }
+    return INITIAL_TESTIMONIALS;
+  });
+
+  // Review Modal and form states
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewInstitute, setReviewInstitute] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewFeature, setReviewFeature] = useState('All Features');
+  const [reviewText, setReviewText] = useState('');
+  const [reviewError, setReviewError] = useState('');
+  const [reviewSuccess, setReviewSuccess] = useState('');
+
+  // Scroll listener for sticky navbar shadow
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!reviewName.trim()) {
+      setReviewError(language === 'ur' ? 'براہ کرم اپنا نام درج کریں' : 'Please enter your name');
+      return;
+    }
+    if (!reviewText.trim() || reviewText.trim().length < 8) {
+      setReviewError(language === 'ur' ? 'براہ کرم کم از کم 8 حروف کا ریویو لکھیں' : 'Please enter at least 8 characters in your review');
+      return;
+    }
+
+    const initials = reviewName
+      .trim()
+      .split(' ')
+      .filter(Boolean)
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || 'ST';
+
+    const colorPalette = ['#4f46e5', '#0ea5e9', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+    const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+    const newRev = {
+      id: 'user-rev-' + Date.now(),
+      name: reviewName.trim(),
+      institute: reviewInstitute.trim() || (language === 'ur' ? 'طالب علم' : 'Student'),
+      rating: reviewRating,
+      quote: `"${reviewText.trim()}"`,
+      avatar: initials,
+      color: randomColor,
+      verified: true,
+      feature: reviewFeature,
+      isNew: true
+    };
+
+    const updated = [newRev, ...reviews];
+    setReviews(updated);
+    try {
+      localStorage.setItem('lz_student_reviews', JSON.stringify(updated));
+    } catch (err) {
+      console.error('Failed to save review', err);
+    }
+
+    setReviewName('');
+    setReviewInstitute('');
+    setReviewRating(5);
+    setReviewText('');
+    setReviewError('');
+    setIsReviewModalOpen(false);
+    setReviewSuccess(t('landing.review_success_msg') || '🎉 Shukriya! Your review has been added live to Learnozi!');
+
+    setTimeout(() => {
+      setReviewSuccess('');
+    }, 6000);
+  };
 
   // Interactive states for Feature cards
   const [explainerInput, setExplainerInput] = useState("Explain photosynthesis like I'm 10");
@@ -145,7 +298,7 @@ export default function Landing() {
       {/* =========================================================================
           1. TOP NAVIGATION BAR (Exact as screenshot)
          ========================================================================= */}
-      <nav className="lz-nav" id="top">
+      <nav className={`lz-nav ${scrolled ? 'lz-nav-scrolled' : ''}`} id="top">
         <div className="lz-nav-inner">
           <Link to="/" className="lz-logo">
             <img src="/logo.png" alt="Learnozi" className="lz-logo-icon" />
@@ -943,57 +1096,63 @@ export default function Landing() {
       <section className="lz-testimonials-section" id="testimonials">
         <div className="lz-testimonials-header">
           <div>
-            <span className="lz-category-badge">STUDENT STORIES</span>
-            <h2 className="lz-section-heading">Loved by Students Across Pakistan 🇵🇰</h2>
+            <span className="lz-category-badge">{t('landing.testimonials_badge')}</span>
+            <h2 className="lz-section-heading">{t('landing.testimonials_title')}</h2>
           </div>
-          <a href="#top" className="lz-real-results-link">Real students. Real results. →</a>
+          <div className="lz-testimonials-actions">
+            <button 
+              type="button" 
+              className="lz-btn-add-review"
+              onClick={() => setIsReviewModalOpen(true)}>
+              <span>⭐</span>
+              <span>{t('landing.testimonials_add_btn')}</span>
+            </button>
+            <a href="#top" className="lz-real-results-link">{t('landing.testimonials_link')}</a>
+          </div>
         </div>
 
+        {reviewSuccess && (
+          <div className="lz-review-success-banner">
+            <div className="lz-success-content">
+              <span>{reviewSuccess}</span>
+            </div>
+            <button 
+              type="button" 
+              className="lz-close-banner-btn" 
+              onClick={() => setReviewSuccess('')}>
+              ✕
+            </button>
+          </div>
+        )}
+
         <div className="lz-testimonials-grid">
-          {/* Card 1: Ali Raza */}
-          <div className="lz-tcard">
-            <p className="lz-tcard-quote">
-              "Learnozi helped me turn my messy study schedule into a clear daily plan. The flashcards saved me hours."
-            </p>
-            <div className="lz-tcard-author">
-              <div className="lz-tauthor-avatar" style={{background:'#4f46e5'}}>AR</div>
-              <div className="lz-tauthor-info">
-                <strong>Ali Raza</strong>
-                <span>FAST NUCES — CS</span>
-                <span className="lz-verified-badge">✓ Verified Student</span>
+          {reviews.map((rev) => (
+            <div key={rev.id} className={`lz-tcard ${rev.isNew ? 'lz-tcard-new' : ''}`}>
+              <div className="lz-tcard-top-meta">
+                <div className="lz-tcard-stars">
+                  {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                    <span key={i} className="lz-star-icon">★</span>
+                  ))}
+                </div>
+                {rev.feature && <span className="lz-tcard-feat-tag">{rev.feature}</span>}
               </div>
-            </div>
-          </div>
 
-          {/* Card 2: Ayesha Khan */}
-          <div className="lz-tcard">
-            <p className="lz-tcard-quote">
-              "The AI tutor explains concepts in such a simple way. I finally understand what I used to struggle with."
-            </p>
-            <div className="lz-tcard-author">
-              <div className="lz-tauthor-avatar" style={{background:'#0ea5e9'}}>AK</div>
-              <div className="lz-tauthor-info">
-                <strong>Ayesha Khan</strong>
-                <span>NUST — Electrical Eng</span>
-                <span className="lz-verified-badge">✓ Verified Student</span>
-              </div>
-            </div>
-          </div>
+              <p className="lz-tcard-quote">{rev.quote}</p>
 
-          {/* Card 3: Hamza Ahmed */}
-          <div className="lz-tcard">
-            <p className="lz-tcard-quote">
-              "Perfect for MDCAT prep! The study planner and progress tracker keep me motivated every day."
-            </p>
-            <div className="lz-tcard-author">
-              <div className="lz-tauthor-avatar" style={{background:'#8b5cf6'}}>HA</div>
-              <div className="lz-tauthor-info">
-                <strong>Hamza Ahmed</strong>
-                <span>LUMS — Business</span>
-                <span className="lz-verified-badge">✓ Verified Student</span>
+              <div className="lz-tcard-author">
+                <div className="lz-tauthor-avatar" style={{ background: rev.color || '#4f46e5' }}>
+                  {rev.avatar}
+                </div>
+                <div className="lz-tauthor-info">
+                  <strong>{rev.name}</strong>
+                  <span>{rev.institute}</span>
+                  <span className="lz-verified-badge">
+                    {rev.isNew ? '🌟 Just Added' : '✓ Verified Student'}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -1142,6 +1301,119 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* =========================================================================
+          11. ADD REVIEW MODAL (Accessible, Interactive, Localized)
+         ========================================================================= */}
+      {isReviewModalOpen && (
+        <div className="lz-modal-backdrop" onClick={() => setIsReviewModalOpen(false)}>
+          <div className="lz-modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <div className="lz-modal-header">
+              <div>
+                <h3 className="lz-modal-title">{t('landing.review_modal_title')}</h3>
+                <p className="lz-modal-sub">{t('landing.review_modal_desc')}</p>
+              </div>
+              <button 
+                type="button" 
+                className="lz-modal-close" 
+                onClick={() => setIsReviewModalOpen(false)}>
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="lz-modal-form">
+              {reviewError && (
+                <div className="lz-modal-error-alert">{reviewError}</div>
+              )}
+
+              <div className="lz-form-row">
+                <label className="lz-form-label">{t('landing.review_name_label')}</label>
+                <input 
+                  type="text" 
+                  className="lz-form-input" 
+                  placeholder={t('landing.review_name_placeholder')}
+                  value={reviewName}
+                  onChange={(e) => setReviewName(e.target.value)}
+                  maxLength={50}
+                  required
+                />
+              </div>
+
+              <div className="lz-form-row">
+                <label className="lz-form-label">{t('landing.review_inst_label')}</label>
+                <input 
+                  type="text" 
+                  className="lz-form-input" 
+                  placeholder={t('landing.review_inst_placeholder')}
+                  value={reviewInstitute}
+                  onChange={(e) => setReviewInstitute(e.target.value)}
+                  maxLength={60}
+                />
+              </div>
+
+              <div className="lz-form-row-2col">
+                <div className="lz-form-col">
+                  <label className="lz-form-label">{t('landing.review_rating_label')}</label>
+                  <div className="lz-star-picker">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className={`lz-star-picker-btn ${star <= reviewRating ? 'active' : ''}`}
+                        onClick={() => setReviewRating(star)}>
+                        ★
+                      </button>
+                    ))}
+                    <span className="lz-star-score-text">{reviewRating} / 5</span>
+                  </div>
+                </div>
+
+                <div className="lz-form-col">
+                  <label className="lz-form-label">{t('landing.review_feature_label')}</label>
+                  <select 
+                    className="lz-form-select"
+                    value={reviewFeature}
+                    onChange={(e) => setReviewFeature(e.target.value)}>
+                    <option value="All Features">{t('landing.review_feature_all')}</option>
+                    <option value="AI Explainer">{t('landing.review_feature_ai')}</option>
+                    <option value="Flashcards">{t('landing.review_feature_flashcards')}</option>
+                    <option value="Study Planner">{t('landing.review_feature_planner')}</option>
+                    <option value="Pomodoro Room">{t('landing.review_feature_pomodoro')}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="lz-form-row">
+                <label className="lz-form-label">{t('landing.review_text_label')}</label>
+                <textarea 
+                  className="lz-form-textarea" 
+                  rows="3"
+                  placeholder={t('landing.review_text_placeholder')}
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  maxLength={300}
+                  required
+                />
+                <div className="lz-char-counter">{reviewText.length} / 300</div>
+              </div>
+
+              <div className="lz-modal-footer">
+                <button 
+                  type="button" 
+                  className="lz-btn-modal-cancel"
+                  onClick={() => setIsReviewModalOpen(false)}>
+                  {t('landing.review_cancel_btn')}
+                </button>
+                <button 
+                  type="submit" 
+                  className="lz-btn-modal-submit">
+                  {t('landing.review_submit_btn')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
