@@ -64,6 +64,39 @@ const INITIAL_TESTIMONIALS = [
 export default function Landing() {
   const { t, language, toggleLanguage } = useLanguage();
 
+  // Light / Dark Theme State with persistence
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('lz_theme') || 'light';
+    }
+    return 'light';
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lz_theme', next);
+        if (next === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [theme]);
+
   // Reviews state with localStorage persistence
   const [reviews, setReviews] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -89,8 +122,39 @@ export default function Landing() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewFeature, setReviewFeature] = useState('All Features');
   const [reviewText, setReviewText] = useState('');
+  const [reviewImg, setReviewImg] = useState('');
+  const [reviewImgPreview, setReviewImgPreview] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [reviewSuccess, setReviewSuccess] = useState('');
+
+  // Marquee auto-scroll and control state
+  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
+
+  // Hero interactive doubt simulation state
+  const [heroAskPrompt, setHeroAskPrompt] = useState("Explain Newton's Laws in simple Urdu");
+  const [heroAnswerPreview, setHeroAnswerPreview] = useState(
+    "🚀 Newton ka 2nd Law (F = m × a): Force kisi cheez ke mass aur uski acceleration ka nateeja hoti hai! Asan misaal: Halki cycle ko chalana asan hai, lekin bhaari car ko aagay dhakelne ke liye bohat zyada taqat (force) lagani padti hai! 🚲🚗"
+  );
+  const [heroAskLoading, setHeroAskLoading] = useState(false);
+
+  const handleHeroAsk = (e) => {
+    if (e) e.preventDefault();
+    if (!heroAskPrompt.trim()) return;
+    setHeroAskLoading(true);
+    setTimeout(() => {
+      const p = heroAskPrompt.toLowerCase();
+      if (p.includes("biology") || p.includes("cell") || p.includes("mdcat")) {
+        setHeroAnswerPreview("🔬 Cell Cycle & Mitosis: Aik cell do identical daughter cells mein divide hota hai. Is ke chaar phases hain: Prophase, Metaphase, Anaphase, aur Telophase! MDCAT ke mutabiq yeh growth aur tissue repair ke liye zaroori hai. 🧬");
+      } else if (p.includes("chemistry") || p.includes("organic")) {
+        setHeroAnswerPreview("🧪 Organic Chemistry: Carbon atoms covalent bonds banatay hain. Alkane (Single bond C-C), Alkene (Double C=C), aur Alkyne (Triple C≡C). Board exams mein IUPAC nomenclature rules sab se important hain! ⚗️");
+      } else if (p.includes("math") || p.includes("calculus") || p.includes("derivative")) {
+        setHeroAnswerPreview("📐 Derivatives: Derivative batata hai ke koi cheez waqt ke sath kitni tezi se badal rahi hai (rate of change)! Jaise speed = distance ka derivative. Formula: d/dx(x^n) = n*x^(n-1). 📈");
+      } else {
+        setHeroAnswerPreview(`💡 "${heroAskPrompt}": Learnozi AI explains concepts directly according to your board textbook syllabus, highlighting past paper patterns and key formulas step-by-step! ✨`);
+      }
+      setHeroAskLoading(false);
+    }, 300);
+  };
 
   // Scroll listener for sticky navbar shadow
   const [scrolled, setScrolled] = useState(false);
@@ -101,6 +165,28 @@ export default function Landing() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2.5 * 1024 * 1024) {
+        setReviewError(language === 'ur' ? 'تصویر کا سائز 2.5MB سے کم ہونا چاہیے' : 'Image size must be under 2.5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReviewImg(reader.result);
+        setReviewImgPreview(reader.result);
+        setReviewError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setReviewImg('');
+    setReviewImgPreview('');
+  };
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -132,6 +218,7 @@ export default function Landing() {
       rating: reviewRating,
       quote: `"${reviewText.trim()}"`,
       avatar: initials,
+      avatarImg: reviewImg || '',
       color: randomColor,
       verified: true,
       feature: reviewFeature,
@@ -150,6 +237,8 @@ export default function Landing() {
     setReviewInstitute('');
     setReviewRating(5);
     setReviewText('');
+    setReviewImg('');
+    setReviewImgPreview('');
     setReviewError('');
     setIsReviewModalOpen(false);
     setReviewSuccess(t('landing.review_success_msg') || '🎉 Shukriya! Your review has been added live to Learnozi!');
@@ -293,10 +382,10 @@ export default function Landing() {
   };
 
   return (
-    <div className={`lz-page ${language === 'ur' ? 'lz-ur-mode' : ''}`}>
+    <div className={`lz-page ${theme === 'dark' ? 'lz-dark-mode' : ''} ${language === 'ur' ? 'lz-ur-mode' : ''}`}>
 
       {/* =========================================================================
-          1. TOP NAVIGATION BAR (Exact as screenshot)
+          1. TOP NAVIGATION BAR (Sticky, Glass, Lang + Dark/Light Mode)
          ========================================================================= */}
       <nav className={`lz-nav ${scrolled ? 'lz-nav-scrolled' : ''}`} id="top">
         <div className="lz-nav-inner">
@@ -314,6 +403,18 @@ export default function Landing() {
           </div>
 
           <div className="lz-nav-right">
+            {/* Theme Toggle Button */}
+            <button 
+              type="button" 
+              className="lz-theme-btn" 
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle Theme">
+              <span className="lz-theme-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="lz-theme-text">{theme === 'dark' ? (t('landing.theme_light') || 'Light') : (t('landing.theme_dark') || 'Dark')}</span>
+            </button>
+
+            {/* Language Switcher Button */}
             <button 
               type="button" 
               className="lz-lang-btn" 
@@ -336,42 +437,39 @@ export default function Landing() {
       </nav>
 
       {/* =========================================================================
-          2. HERO SECTION (With exact UI preview mockup & doodles)
+          2. HERO SECTION (High Impact, Glowing Gradient, Live AI Doubt Solver)
          ========================================================================= */}
       <section className="lz-hero-section">
+        <div className="lz-hero-ambient-glow"></div>
         <div className="lz-hero-container">
-          {/* Left Column: Headline, Subtitle, Pills, CTAs, Trust Row, Avatars */}
+          {/* Left Column: Exactly matching reference image */}
           <div className="lz-hero-left">
-            <div className="lz-companion-badge">
+            <div className="lz-companion-badge lz-ribbon-badge">
               <span className="lz-flag-tag">🇵🇰</span>
-              <span>{t('landing.badge') || "Pakistan's AI Study Companion"}</span>
+              <span>Pakistan's #1 AI Study Companion.</span>
             </div>
 
             <h1 className="lz-hero-h1">
-              <span>{t('landing.hero_title_1') || "Study smarter."}</span><br />
-              <span className="lz-h1-accent">{t('landing.hero_title_2') || "Ace every exam."}</span>
-              {/* Playful ribbon doodle on top-right of headline */}
-              <svg className="lz-hero-doodle-curl" width="45" height="45" viewBox="0 0 50 50" fill="none">
-                <path d="M12 38 C 16 10, 36 6, 40 18 C 44 30, 24 38, 20 25 C 18 18, 30 14, 38 28" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <span>Study Smarter.</span><br />
+              <span className="lz-h1-accent">Ace Every Exam.</span>
             </h1>
 
             <p className="lz-hero-subtitle">
-              {t('landing.hero_sub') || "Your AI tutor, study planner, flashcards and focus coach — built around your syllabus."}
+              Your AI tutor, study planner, flashcards, and focus coach — tailored for the Pakistani syllabus.
             </p>
 
-            {/* Quick Micro Feature Pills */}
+            {/* Feature Pills from Reference Screenshot */}
             <div className="lz-hero-feature-pills">
-              <span className="lz-fpill">
-                <span className="lz-fpill-icon">🤖</span> AI Tutor
+              <span className="lz-fpill lz-fpill-grey">
+                <span className="lz-fpill-icon">💬</span> AI Tutor
               </span>
-              <span className="lz-fpill">
+              <span className="lz-fpill lz-fpill-teal">
                 <span className="lz-fpill-icon">📅</span> Study Planner
               </span>
-              <span className="lz-fpill">
+              <span className="lz-fpill lz-fpill-peach">
                 <span className="lz-fpill-icon">🗂️</span> Flashcards
               </span>
-              <span className="lz-fpill">
+              <span className="lz-fpill lz-fpill-grey">
                 <span className="lz-fpill-icon">⏱️</span> Focus Timer
               </span>
             </div>
@@ -379,19 +477,23 @@ export default function Landing() {
             {/* CTA Buttons */}
             <div className="lz-hero-actions">
               <Link to="/signup" className="lz-btn-primary-purple">
-                {t('landing.btn_signup') || "Start Studying Free →"}
+                Start Studying Free →
               </Link>
               <a href="#how-it-works" className="lz-btn-how-works">
-                <span className="lz-play-icon">▶</span> {t('landing.btn_how') || "See How It Works"}
+                Watch a Demo | How it Works →
               </a>
             </div>
 
-            {/* Trust Checklist Row */}
-            <div className="lz-trust-row">
-              <span className="lz-trust-item"><span className="lz-green-check">✓</span> No credit card required</span>
-              <span className="lz-trust-item"><span className="lz-green-check">✓</span> Free to start</span>
-              <span className="lz-trust-item"><span className="lz-green-check">✓</span> English + Urdu</span>
-              <span className="lz-trust-item"><span className="lz-green-check">✓</span> Built for Pakistani students</span>
+            {/* Trust Checklist Row matching reference */}
+            <div className="lz-trust-row lz-trust-stacked">
+              <div className="lz-trust-line">
+                <span className="lz-trust-item"><span className="lz-green-check">✓</span> No credit card needed</span>
+                <span className="lz-trust-item"><span className="lz-green-check">✓</span> Free to start</span>
+                <span className="lz-trust-item"><span className="lz-green-check">✓</span> 100% Urdu & English</span>
+              </div>
+              <div className="lz-trust-line">
+                <span className="lz-trust-item"><span className="lz-green-check">✓</span> Pakistan Syllabus Supported <span className="lz-green-check">✓</span></span>
+              </div>
             </div>
 
             {/* Social Proof Counter */}
@@ -403,130 +505,181 @@ export default function Landing() {
                 <span className="lz-avatar-c" style={{background:'#10b981'}}>FN</span>
               </div>
               <div className="lz-social-caption">
-                <strong>10,000+</strong>
-                <span>students are studying smarter</span>
+                <strong>Trusted by 10,000+</strong>
+                <span>Students Studying Smarter. 📈</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Exact UI Dashboard Preview from Screenshot */}
-          <div className="lz-hero-right">
-            <div className="lz-app-mockup">
-              {/* Mockup Header bar */}
-              <div className="lz-mockup-header">
-                <div className="lz-mockup-brand">
-                  <span className="lz-mockup-avatar-bot">🤖</span>
-                  <div>
-                    <strong>Learnozi AI</strong>
-                    <span className="lz-online-text">● Online</span>
-                  </div>
-                </div>
-                <div className="lz-mockup-streak-user">
-                  <span className="lz-streak-pill">🔥 7 day streak</span>
-                  <span className="lz-mockup-user-circle">👨‍🎓</span>
-                </div>
-              </div>
+          {/* Right Column: Tablet Mockup with Orbiting Floating Cards matching reference image */}
+          <div className="lz-hero-right lz-hero-orbit-stage">
+            {/* Ambient Cosmic Orbital Rings & Glow */}
+            <div className="lz-orbit-ring lz-orbit-ring-1"></div>
+            <div className="lz-orbit-ring lz-orbit-ring-2"></div>
+            <div className="lz-orbit-dot lz-orbit-dot-1"></div>
+            <div className="lz-orbit-dot lz-orbit-dot-2"></div>
+            <div className="lz-orbit-dot lz-orbit-dot-3"></div>
 
-              {/* Mockup Body: Sidebar + Main Workspace */}
-              <div className="lz-mockup-body">
-                {/* Left Mini Sidebar */}
-                <aside className="lz-mockup-sidebar">
-                  <div className="lz-sidebar-link active">🏠 <span>Home</span></div>
-                  <div className="lz-sidebar-link">📅 <span>Study Plan</span></div>
-                  <div className="lz-sidebar-link">🗂️ <span>Flashcards</span></div>
-                  <div className="lz-sidebar-link">⏱️ <span>Focus Timer</span></div>
-                  <div className="lz-sidebar-link">📊 <span>Progress</span></div>
-                  <div className="lz-sidebar-link">⚙️ <span>More</span></div>
-                </aside>
-
-                {/* Main Workspace Canvas */}
-                <main className="lz-mockup-main">
-                  <div className="lz-mockup-main-top">
+            {/* Central Tablet Container */}
+            <div className="lz-tablet-device">
+              {/* Tablet Outer Hardware Bezel & Camera */}
+              <div className="lz-tablet-camera-notch"></div>
+              
+              <div className="lz-tablet-screen">
+                {/* Tablet Top App Bar */}
+                <div className="lz-tablet-appbar">
+                  <div className="lz-tablet-bot-meta">
+                    <span className="lz-tablet-bot-avatar-mini">🤖</span>
                     <div>
-                      <h4 className="lz-main-greet">Good evening, Ali ☀️</h4>
-                      <p className="lz-main-ask">What are you studying today?</p>
-                    </div>
-                    <select 
-                      className="lz-subject-dropdown"
-                      value={heroSubject}
-                      onChange={(e) => setHeroSubject(e.target.value)}>
-                      <option>Physics — Newton's Laws</option>
-                      <option>Chemistry — Organic Reactions</option>
-                      <option>Mathematics — Calculus</option>
-                    </select>
-                  </div>
-
-                  {/* Two columns inside mockup */}
-                  <div className="lz-mockup-content-grid">
-                    {/* Left Card: Today's Study Plan */}
-                    <div className="lz-preview-card lz-card-study-plan">
-                      <div className="lz-card-title-row">
-                        <strong>Today's Study Plan</strong>
-                        <span className="lz-plan-ratio">
-                          {heroChecklist.filter(c => c.done).length}/3 completed
-                        </span>
-                      </div>
-                      <div className="lz-checklist-wrap">
-                        {heroChecklist.map(item => (
-                          <div 
-                            key={item.id} 
-                            className={`lz-chk-item ${item.done ? 'checked' : ''}`}
-                            onClick={() => toggleHeroChecklist(item.id)}>
-                            <span className="lz-chk-box">{item.done ? '☑' : '☐'}</span>
-                            <span className="lz-chk-text">{item.text}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="lz-preview-progress-row">
-                        <div className="lz-prog-label">
-                          <span>Weekly Progress</span>
-                          <strong>75%</strong>
-                        </div>
-                        <div className="lz-prog-track">
-                          <div className="lz-prog-bar" style={{width: '75%'}} />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Card: AI Tutor Bubble */}
-                    <div className="lz-preview-card lz-card-ai-tutor">
-                      <div className="lz-card-title-row">
-                        <span className="lz-ai-tutor-label">✨ AI Tutor</span>
-                        <span className="lz-tiny-status">●</span>
-                      </div>
-                      <div className="lz-bubble-query">
-                        Explain Newton's 2nd Law simply
-                      </div>
-                      <div className="lz-bubble-reply">
-                        <span className="lz-formula-pill">F = ma</span>
-                        <p>
-                          Force equals mass times acceleration. In simple words: the heavier the object, the harder you must push it!
-                        </p>
-                      </div>
-                      <div className="lz-preview-input-row">
-                        <input type="text" placeholder="Ask a follow-up..." readOnly />
-                        <button type="button">➤</button>
-                      </div>
+                      <strong className="lz-tablet-bot-name">Learnozi AI</strong>
+                      <span className="lz-tablet-bot-status">● Online</span>
                     </div>
                   </div>
-                </main>
-              </div>
+                </div>
 
-              {/* Floating badges around mockup */}
-              <div className="lz-float-card lz-float-top-right">
-                <span className="lz-float-icon">🗂️</span>
-                <div>
-                  <strong>10 Flashcards</strong>
-                  <small>ready</small>
+                {/* 3D Robot Avatar in Glowing Circular Badge */}
+                <div className="lz-tablet-robot-avatar-wrap">
+                  <div className="lz-robot-glow-ring"></div>
+                  <img 
+                    src="/assets/hero-robot-tutor.jpg" 
+                    alt="Learnozi 3D AI Robot Tutor" 
+                    className="lz-tablet-robot-img" 
+                  />
+                </div>
+
+                {/* AI Tutor Chat Card with Newton's Cradle Visual */}
+                <div className="lz-tablet-chat-card">
+                  <div className="lz-tablet-chat-header">
+                    <span className="lz-chat-sparkle">✨</span>
+                    <strong>AI Tutor:</strong>
+                  </div>
+                  <p className="lz-tablet-chat-msg">
+                    Got questions on Newton's Laws? Let's check this Newton's Cradle visual!
+                  </p>
+                  <span className="lz-tablet-chat-subnote">[Moving visual on screen] ...</span>
+
+                  <div className="lz-tablet-visual-box">
+                    <img 
+                      src="/assets/hero-cradle.jpg" 
+                      alt="Newton's Cradle Demonstration" 
+                      className="lz-tablet-cradle-img"
+                    />
+                    <div className="lz-cradle-motion-tag">F = m × a</div>
+                  </div>
+                </div>
+
+                {/* Bottom Chat Prompt Input */}
+                <div className="lz-tablet-input-bar">
+                  <span className="lz-tablet-input-placeholder">Ask a follow up...</span>
+                  <button type="button" className="lz-tablet-send-btn" aria-label="Send query">
+                    ➤
+                  </button>
                 </div>
               </div>
+            </div>
 
-              <div className="lz-float-card lz-float-bottom-right">
-                <span className="lz-float-icon">📊</span>
-                <div>
-                  <strong>Smart Quota</strong>
-                  <small>ready</small>
+            {/* 5 Floating Orbiting Cards Matching Reference Image */}
+
+            {/* 1. Top-Left: 10 New Flashcards Created */}
+            <div className="lz-float-card-orbit lz-fcard-flashcards">
+              <div className="lz-fcard-fc-thumb-wrap">
+                <img src="/assets/hero-flashcards.jpg" alt="Flashcards Deck" className="lz-fcard-fc-img" />
+              </div>
+              <div className="lz-fcard-fc-text">
+                <strong>10 New Flashcards</strong>
+                <span>Created.</span>
+              </div>
+            </div>
+
+            {/* 2. Bottom-Left: Weekly Progress (Orange Area Chart) */}
+            <div className="lz-float-card-orbit lz-fcard-progress-orange">
+              <div className="lz-fcard-chart-title">Weekly Progress</div>
+              <div className="lz-fcard-chart-wrap">
+                <svg viewBox="0 0 140 60" className="lz-fcard-svg-chart">
+                  <defs>
+                    <linearGradient id="orangeChartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f97316" stopOpacity="0.45" />
+                      <stop offset="100%" stopColor="#f97316" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <text x="5" y="15" className="lz-chart-axis-txt">30</text>
+                  <text x="5" y="32" className="lz-chart-axis-txt">20</text>
+                  <text x="5" y="49" className="lz-chart-axis-txt">10</text>
+                  <line x1="20" y1="12" x2="135" y2="12" stroke="#f1f5f9" strokeDasharray="2 2" />
+                  <line x1="20" y1="30" x2="135" y2="30" stroke="#f1f5f9" strokeDasharray="2 2" />
+                  <line x1="20" y1="48" x2="135" y2="48" stroke="#f1f5f9" strokeDasharray="2 2" />
+                  
+                  <path 
+                    d="M 22 45 Q 40 38, 55 42 T 85 28 T 115 35 T 135 18 L 135 52 L 22 52 Z" 
+                    fill="url(#orangeChartGrad)" 
+                  />
+                  <path 
+                    d="M 22 45 Q 40 38, 55 42 T 85 28 T 115 35 T 135 18" 
+                    fill="none" 
+                    stroke="#ea580c" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                  />
+                </svg>
+                <div className="lz-chart-x-labels">
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
                 </div>
+              </div>
+            </div>
+
+            {/* 3. Top-Right: Weekly Progress (Blue Smooth Wave) */}
+            <div className="lz-float-card-orbit lz-fcard-progress-blue">
+              <div className="lz-fcard-chart-title">Weekly Progress</div>
+              <div className="lz-fcard-chart-wrap">
+                <svg viewBox="0 0 140 60" className="lz-fcard-svg-chart">
+                  <defs>
+                    <linearGradient id="blueChartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+                  <text x="5" y="14" className="lz-chart-axis-txt">300</text>
+                  <text x="5" y="29" className="lz-chart-axis-txt">200</text>
+                  <text x="5" y="44" className="lz-chart-axis-txt">100</text>
+                  <text x="5" y="56" className="lz-chart-axis-txt">0</text>
+                  <line x1="24" y1="12" x2="135" y2="12" stroke="#f1f5f9" strokeDasharray="2 2" />
+                  <line x1="24" y1="27" x2="135" y2="27" stroke="#f1f5f9" strokeDasharray="2 2" />
+                  <line x1="24" y1="42" x2="135" y2="42" stroke="#f1f5f9" strokeDasharray="2 2" />
+
+                  <path 
+                    d="M 25 50 C 45 48, 60 22, 80 35 C 100 48, 115 15, 135 22 L 135 56 L 25 56 Z" 
+                    fill="url(#blueChartGrad)" 
+                  />
+                  <path 
+                    d="M 25 50 C 45 48, 60 22, 80 35 C 100 48, 115 15, 135 22" 
+                    fill="none" 
+                    stroke="#2563eb" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                  />
+                </svg>
+                <div className="lz-chart-x-labels">
+                  <span>Jan</span>
+                  <span>Wed</span>
+                  <span>Tue</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Middle-Right: Physics Newton's 2nd Law pill */}
+            <div className="lz-float-card-orbit lz-fcard-physics">
+              <strong>Physics — Newton's 2nd Law: F=ma</strong>
+              <small>with illustration.</small>
+            </div>
+
+            {/* 5. Bottom-Right: Biology Animal Cell Card */}
+            <div className="lz-float-card-orbit lz-fcard-biology">
+              <div className="lz-fcard-bio-title">Biology</div>
+              <div className="lz-fcard-bio-thumb">
+                <img src="/assets/hero-cell.jpg" alt="Biology Cell Diagram" className="lz-fcard-cell-img" />
               </div>
             </div>
           </div>
@@ -1091,13 +1244,18 @@ export default function Landing() {
       </section>
 
       {/* =========================================================================
-          8. STUDENT STORIES (Loved by Students Across Pakistan 🇵🇰)
+          8. STUDENT STORIES (Loved by Students Across Pakistan 🇵🇰) - Single Line Marquee
          ========================================================================= */}
       <section className="lz-testimonials-section" id="testimonials">
         <div className="lz-testimonials-header">
           <div>
             <span className="lz-category-badge">{t('landing.testimonials_badge')}</span>
             <h2 className="lz-section-heading">{t('landing.testimonials_title')}</h2>
+            <p className="lz-testimonials-subtitle">
+              {language === 'ur' 
+                ? 'ہزاروں طلباء نے Learnozi کے ساتھ اپنے درجات اور اسٹڈی عادات کو بہتر بنایا ہے' 
+                : 'Real Pakistani students crushing their board and university exams with Learnozi'}
+            </p>
           </div>
           <div className="lz-testimonials-actions">
             <button 
@@ -1125,34 +1283,41 @@ export default function Landing() {
           </div>
         )}
 
-        <div className="lz-testimonials-grid">
-          {reviews.map((rev) => (
-            <div key={rev.id} className={`lz-tcard ${rev.isNew ? 'lz-tcard-new' : ''}`}>
-              <div className="lz-tcard-top-meta">
-                <div className="lz-tcard-stars">
-                  {Array.from({ length: rev.rating || 5 }).map((_, i) => (
-                    <span key={i} className="lz-star-icon">★</span>
-                  ))}
+        {/* Continuous Single-Line Scrolling Marquee */}
+        <div className="lz-testimonials-marquee-wrapper" aria-label="Student Reviews Carousel">
+          <div className="lz-testimonials-marquee-track">
+            {[...reviews, ...reviews].map((rev, idx) => (
+              <div key={`${rev.id}-${idx}`} className={`lz-tcard lz-tcard-marquee ${rev.isNew ? 'lz-tcard-new' : ''}`}>
+                <div className="lz-tcard-top-meta">
+                  <div className="lz-tcard-stars">
+                    {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                      <span key={i} className="lz-star-icon">★</span>
+                    ))}
+                  </div>
+                  {rev.feature && <span className="lz-tcard-feat-tag">{rev.feature}</span>}
                 </div>
-                {rev.feature && <span className="lz-tcard-feat-tag">{rev.feature}</span>}
-              </div>
 
-              <p className="lz-tcard-quote">{rev.quote}</p>
+                <p className="lz-tcard-quote">{rev.quote}</p>
 
-              <div className="lz-tcard-author">
-                <div className="lz-tauthor-avatar" style={{ background: rev.color || '#4f46e5' }}>
-                  {rev.avatar}
-                </div>
-                <div className="lz-tauthor-info">
-                  <strong>{rev.name}</strong>
-                  <span>{rev.institute}</span>
-                  <span className="lz-verified-badge">
-                    {rev.isNew ? '🌟 Just Added' : '✓ Verified Student'}
-                  </span>
+                <div className="lz-tcard-author">
+                  {rev.avatarImg ? (
+                    <img src={rev.avatarImg} alt={rev.name} className="lz-tauthor-img" />
+                  ) : (
+                    <div className="lz-tauthor-avatar" style={{ background: rev.color || '#4f46e5' }}>
+                      {rev.avatar}
+                    </div>
+                  )}
+                  <div className="lz-tauthor-info">
+                    <strong>{rev.name}</strong>
+                    <span>{rev.institute}</span>
+                    <span className="lz-verified-badge">
+                      {rev.isNew ? '🌟 Just Added' : '✓ Verified Student'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -1305,18 +1470,29 @@ export default function Landing() {
       {/* =========================================================================
           11. ADD REVIEW MODAL (Accessible, Interactive, Localized)
          ========================================================================= */}
+      {/* =========================================================================
+          11. WRITE A REVIEW MODAL (With Optional Photo Upload & Modern UI)
+         ========================================================================= */}
       {isReviewModalOpen && (
         <div className="lz-modal-backdrop" onClick={() => setIsReviewModalOpen(false)}>
-          <div className="lz-modal-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="lz-modal-dialog lz-review-modal-modern" onClick={(e) => e.stopPropagation()}>
             <div className="lz-modal-header">
-              <div>
-                <h3 className="lz-modal-title">{t('landing.review_modal_title')}</h3>
-                <p className="lz-modal-sub">{t('landing.review_modal_desc')}</p>
+              <div className="lz-modal-header-left">
+                <div className="lz-modal-avatar-badge">✍️</div>
+                <div>
+                  <h3 className="lz-modal-title">{t('landing.review_modal_title')}</h3>
+                  <p className="lz-modal-sub">
+                    {language === 'ur'
+                      ? 'اپنا حقیقی تجربہ شیئر کریں اور پاکستانی طلباء کو متاثر کریں'
+                      : 'Share your real experience & inspire students across Pakistan'}
+                  </p>
+                </div>
               </div>
               <button 
                 type="button" 
                 className="lz-modal-close" 
-                onClick={() => setIsReviewModalOpen(false)}>
+                onClick={() => setIsReviewModalOpen(false)}
+                aria-label="Close modal">
                 ✕
               </button>
             </div>
@@ -1326,29 +1502,70 @@ export default function Landing() {
                 <div className="lz-modal-error-alert">{reviewError}</div>
               )}
 
-              <div className="lz-form-row">
-                <label className="lz-form-label">{t('landing.review_name_label')}</label>
-                <input 
-                  type="text" 
-                  className="lz-form-input" 
-                  placeholder={t('landing.review_name_placeholder')}
-                  value={reviewName}
-                  onChange={(e) => setReviewName(e.target.value)}
-                  maxLength={50}
-                  required
-                />
+              <div className="lz-form-row-2col">
+                <div className="lz-form-col">
+                  <label className="lz-form-label">{t('landing.review_name_label')}</label>
+                  <input 
+                    type="text" 
+                    className="lz-form-input" 
+                    placeholder={t('landing.review_name_placeholder')}
+                    value={reviewName}
+                    onChange={(e) => setReviewName(e.target.value)}
+                    maxLength={50}
+                    required
+                  />
+                </div>
+
+                <div className="lz-form-col">
+                  <label className="lz-form-label">{t('landing.review_inst_label')}</label>
+                  <input 
+                    type="text" 
+                    className="lz-form-input" 
+                    placeholder={t('landing.review_inst_placeholder')}
+                    value={reviewInstitute}
+                    onChange={(e) => setReviewInstitute(e.target.value)}
+                    maxLength={60}
+                  />
+                </div>
               </div>
 
-              <div className="lz-form-row">
-                <label className="lz-form-label">{t('landing.review_inst_label')}</label>
-                <input 
-                  type="text" 
-                  className="lz-form-input" 
-                  placeholder={t('landing.review_inst_placeholder')}
-                  value={reviewInstitute}
-                  onChange={(e) => setReviewInstitute(e.target.value)}
-                  maxLength={60}
-                />
+              {/* Optional Student Photo Upload */}
+              <div className="lz-form-row lz-photo-upload-row">
+                <div className="lz-photo-label-row">
+                  <label className="lz-form-label">{t('landing.review_photo_label') || 'Student Photo'}</label>
+                  <span className="lz-photo-optional-tag">{t('landing.review_photo_optional') || 'Optional'}</span>
+                </div>
+                
+                {reviewImgPreview ? (
+                  <div className="lz-photo-preview-box">
+                    <img src={reviewImgPreview} alt="Student Preview" className="lz-photo-thumb" />
+                    <div className="lz-photo-meta">
+                      <span className="lz-photo-success-txt">✓ Photo uploaded</span>
+                      <button 
+                        type="button" 
+                        className="lz-btn-photo-remove" 
+                        onClick={handleRemoveImage}>
+                        {t('landing.review_photo_remove') || 'Remove Photo'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="lz-photo-uploader-label">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="lz-file-input" 
+                      onChange={handleImageUpload}
+                    />
+                    <div className="lz-uploader-content">
+                      <span className="lz-uploader-icon">📷</span>
+                      <div>
+                        <strong>{t('landing.review_photo_upload_btn') || 'Click to select profile picture'}</strong>
+                        <p>{t('landing.review_photo_help') || 'PNG, JPG or WebP (max 2.5MB)'}</p>
+                      </div>
+                    </div>
+                  </label>
+                )}
               </div>
 
               <div className="lz-form-row-2col">
