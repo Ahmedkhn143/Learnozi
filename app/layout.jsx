@@ -7,6 +7,9 @@ export const metadata = {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+  verification: {
+    google: 'google6ea23c10c93f9b0b',
+  },
 };
 
 export default function RootLayout({ children }) {
