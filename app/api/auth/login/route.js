@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import bcrypt from 'bcryptjs';
+import { findUserByEmail, verifyPassword } from '@/lib/userStore';
 import { signToken } from '@/lib/auth';
 
 export async function POST(req) {
@@ -8,13 +7,16 @@ export async function POST(req) {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
     }
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Special handler for demo credentials
-    if (cleanEmail === 'demo@learnozi.com' || cleanEmail === 'demo') {
+    // Quick demo student handler
+    if ((cleanEmail === 'demo@learnozi.com' || cleanEmail === 'demo') && (password === 'demo1234' || password === 'demo')) {
       const demoUser = {
         id: 'demo_user_123',
         name: 'Demo Student',
@@ -26,43 +28,51 @@ export async function POST(req) {
       return NextResponse.json({ token, user: demoUser });
     }
 
-    // Database lookup
-    try {
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('id, name, email, password, academic_profile')
-        .eq('email', cleanEmail)
-        .maybeSingle();
-
-      if (user && (await bcrypt.compare(password, user.password))) {
-        const token = signToken({ id: user.id, email: user.email });
-        return NextResponse.json({
-          token,
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            isOnboarded: !!(user.academic_profile && user.academic_profile.educationLevel),
-            academicProfile: user.academic_profile,
-          },
-        });
-      }
-    } catch (dbErr) {
-      console.warn('Supabase DB lookup skipped or failed, using auth fallback');
+    // Find user in store
+    const user = await findUserByEmail(cleanEmail);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'No account found with this email. Please check your email or sign up.' },
+        { status: 401 }
+      );
     }
 
-    // Mock auth fallback for testing if database is not configured
-    const mockUser = {
-      id: `user_${Date.now()}`,
-      name: cleanEmail.split('@')[0] || 'Learner',
-      email: cleanEmail,
-      isOnboarded: true,
-      academicProfile: { educationLevel: 'University' },
-    };
-    const token = signToken({ id: mockUser.id, email: mockUser.email });
-    return NextResponse.json({ token, user: mockUser });
+    // Check if user registered via Google without a local password
+    if (!user.password && user.provider === 'google') {
+      return NextResponse.json(
+        { error: 'This account was created with Google. Please use "Continue with Google" to log in.' },
+        { status: 400 }
+      );
+    }
 
+    // Verify password
+    const isMatch = await verifyPassword(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { error: 'Invalid email or password. Please try again.' },
+        { status: 401 }
+      );
+    }
+
+    // Sign JWT token
+    const token = signToken({ id: user.id, email: user.email });
+
+    return NextResponse.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        isOnboarded: user.isOnboarded !== undefined ? user.isOnboarded : true,
+        academicProfile: user.academicProfile || user.academic_profile || { educationLevel: 'University' },
+      },
+    });
   } catch (error) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }

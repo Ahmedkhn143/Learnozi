@@ -88,6 +88,30 @@ export function AuthProvider({ children }) {
     return demoData;
   };
 
+  const googleLogin = async (googleUserData) => {
+    try {
+      const res = await axios.post('/api/auth/google', googleUserData);
+      const { token, user: userData } = res.data;
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user_data', JSON.stringify(userData));
+        setUser(userData);
+      }
+      return userData;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Google sign-in failed.';
+      throw new Error(errorMsg);
+    }
+  };
+
+  const setAuthSession = (token, userData) => {
+    if (token) localStorage.setItem('token', token);
+    if (userData) {
+      localStorage.setItem('user_data', JSON.stringify(userData));
+      setUser(userData);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user_data');
@@ -95,7 +119,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, demoLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, setAuthSession, demoLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

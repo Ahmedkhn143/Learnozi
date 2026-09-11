@@ -14,6 +14,8 @@ export default function ForgotPassword() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [resetUrl, setResetUrl] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -25,7 +27,10 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+      const res = await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+      if (res.data.resetUrl) {
+        setResetUrl(res.data.resetUrl);
+      }
       setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong. Please try again.');
@@ -40,7 +45,7 @@ export default function ForgotPassword() {
         <h1 className="auth-3d-title">{t('auth.reset_password_title')}</h1>
         <p className="auth-3d-subtitle">
           {success 
-            ? 'Check your inbox! We sent a password reset link to your email.' 
+            ? 'Password reset instructions generated successfully.' 
             : t('auth.reset_password_sub')}
         </p>
       </div>
@@ -53,11 +58,38 @@ export default function ForgotPassword() {
 
       {success ? (
         <div className="text-center mt-4">
-          <div style={{ fontSize: '3rem', margin: '1rem 0' }}>✉️</div>
+          <div style={{ fontSize: '3rem', margin: '0.75rem 0' }}>✉️</div>
           <p style={{ color: '#4b5563', fontSize: '0.92rem', lineHeight: '1.6' }}>
-            We've sent reset instructions to <strong>{email}</strong>. Please check your inbox and spam folder.
+            Password reset link has been created for <strong>{email}</strong>.
           </p>
-          <Link to="/login" className="btn-3d btn-3d-primary mt-4" style={{ display: 'block', textDecoration: 'none' }}>
+          {resetUrl && (
+            <div style={{
+              margin: '1.25rem 0',
+              padding: '1rem',
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              borderRadius: '12px',
+              textAlign: 'left'
+            }}>
+              <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.85rem', fontWeight: 600, color: '#166534' }}>
+                🔗 Direct Reset Link:
+              </p>
+              <Link
+                to={resetUrl}
+                className="btn-3d btn-3d-primary"
+                style={{
+                  display: 'block',
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                  padding: '0.75rem 1.25rem',
+                  textAlign: 'center',
+                }}
+              >
+                Reset My Password Now →
+              </Link>
+            </div>
+          )}
+          <Link to="/login" className="btn-3d btn-3d-demo mt-3" style={{ display: 'block', textDecoration: 'none' }}>
             {t('auth.back_to_login')}
           </Link>
         </div>
