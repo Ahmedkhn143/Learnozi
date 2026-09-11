@@ -59,7 +59,7 @@ export default function Auth3DLayout({ children }) {
           {/* Brand Header */}
           <div className="auth-3d-brand">
             <Link to="/" className="brand-badge-3d" title="Learnozi Home">
-              <span className="brand-letter-icon">L</span>
+              <img src="/logo.png" alt="Learnozi" className="brand-badge-logo-img" />
             </Link>
             <span className="brand-name-3d">Learnozi</span>
           </div>

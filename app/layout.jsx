@@ -3,6 +3,10 @@ import '../src/index.css';
 export const metadata = {
   title: 'Learnozi — AI Powered Study & Productivity Platform',
   description: 'AI-assisted study planner, flashcards, pomodoro timer, and exam preparation platform.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({ children }) {

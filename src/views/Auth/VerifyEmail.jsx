@@ -37,7 +37,9 @@ export default function VerifyEmail() {
     <div className="auth-page">
       <div className="card auth-card" style={{ textAlign: 'center' }}>
         <div className="auth-header">
-          <Link to="/" className="auth-logo">L</Link>
+          <Link to="/" className="auth-logo" title="Learnozi Home">
+            <img src="/logo.png" alt="Learnozi" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+          </Link>
         </div>
 
         {status === 'verifying' && (

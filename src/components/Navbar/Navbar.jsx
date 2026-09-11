@@ -130,7 +130,7 @@ export default function Navbar() {
         <div className="sidebar-header">
           <Link to="/dashboard" className="sidebar-brand">
             <div className="brand-icon-wrap">
-              <span className="brand-icon">L</span>
+              <img src="/logo.png" alt="Learnozi" className="brand-logo-img" />
             </div>
             <div className="brand-text">
               <span className="brand-name">Learnozi</span>
@@ -242,7 +242,10 @@ export default function Navbar() {
         <div className="mobile-drawer-overlay" onClick={closeMobile}>
           <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
-              <span className="brand-name">Learnozi</span>
+              <div className="drawer-brand">
+                <img src="/logo.png" alt="Learnozi" className="drawer-logo-img" />
+                <span className="brand-name">Learnozi</span>
+              </div>
               <button className="close-btn" onClick={closeMobile}>✕</button>
             </div>
             <nav className="mobile-nav">

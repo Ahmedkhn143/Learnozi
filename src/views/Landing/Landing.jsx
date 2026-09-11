@@ -10,7 +10,10 @@ export default function Landing() {
 
       {/* NAV */}
       <nav className="ln-nav">
-        <div className="ln-logo">Learn<span>ozi</span></div>
+        <Link to="/" className="ln-logo">
+          <img src="/logo.png" alt="Learnozi" className="ln-logo-img" />
+          <span>Learn<span className="ln-logo-accent">ozi</span></span>
+        </Link>
         <div className="ln-nav-links">
           <a href="#features">{t('nav.features')}</a>
           <a href="#compare">{t('nav.why_learnozi')}</a>
@@ -203,7 +206,10 @@ export default function Landing() {
 
       {/* FOOTER */}
       <footer className="ln-footer">
-        <div className="ln-footer-logo">Learnozi</div>
+        <div className="ln-footer-logo">
+          <img src="/logo.png" alt="Learnozi" className="ln-footer-logo-img" />
+          <span>Learnozi</span>
+        </div>
         <div className="ln-footer-links">
           <a href="#">Privacy</a>
           <a href="#">Terms</a>

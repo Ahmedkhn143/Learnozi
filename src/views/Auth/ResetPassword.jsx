@@ -54,7 +54,9 @@ export default function ResetPassword() {
       <div className="auth-page">
         <div className="card auth-card" style={{ textAlign: 'center' }}>
           <div className="auth-header">
-            <Link to="/" className="auth-logo">L</Link>
+            <Link to="/" className="auth-logo" title="Learnozi Home">
+              <img src="/logo.png" alt="Learnozi" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+            </Link>
           </div>
           <div className="verify-icon success">✓</div>
           <h2>Password Reset! 🎉</h2>
@@ -70,7 +72,9 @@ export default function ResetPassword() {
     <div className="auth-page">
       <div className="card auth-card">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">L</Link>
+          <Link to="/" className="auth-logo" title="Learnozi Home">
+            <img src="/logo.png" alt="Learnozi" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+          </Link>
           <h2>New Password Set Karo</h2>
           <p>Apna naya password choose karo</p>
         </div>

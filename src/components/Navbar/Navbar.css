@@ -30,11 +30,27 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+  padding: 4px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar-brand:hover .brand-icon-wrap {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-icon {
@@ -327,6 +343,18 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 1rem;
+}
+
+.drawer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.drawer-logo-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .close-btn {
