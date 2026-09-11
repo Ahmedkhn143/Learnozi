@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../../context/LanguageContext';
 import Auth3DLayout from './Auth3DLayout';
+import CaptchaInput, { generateCaptchaCode } from '../../components/Captcha/CaptchaInput';
 import './Auth.css';
-
-import { API_URL } from '../../config';
 
 export default function ForgotPassword() {
   const { t } = useLanguage();
@@ -13,27 +12,53 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [resetUrl, setResetUrl] = useState('');
+  const [previewCode, setPreviewCode] = useState('');
+
+  // Captcha State
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, []);
+
+  const refreshCaptcha = () => {
+    setCaptchaCode(generateCaptchaCode());
+    setCaptchaInput('');
+    setCaptchaError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setCaptchaError('');
 
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Please enter a valid email address.');
       return;
     }
 
+    if (captchaInput.trim().toUpperCase() !== captchaCode) {
+      setCaptchaError('Captcha code does not match. Please try again.');
+      refreshCaptcha();
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+      const res = await axios.post('/api/auth/forgot-password', { email });
       if (res.data.resetUrl) {
         setResetUrl(res.data.resetUrl);
+      }
+      if (res.data.previewCode) {
+        setPreviewCode(res.data.previewCode);
       }
       setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong. Please try again.');
+      refreshCaptcha();
     } finally {
       setLoading(false);
     }
@@ -45,7 +70,7 @@ export default function ForgotPassword() {
         <h1 className="auth-3d-title">{t('auth.reset_password_title')}</h1>
         <p className="auth-3d-subtitle">
           {success 
-            ? 'Password reset instructions generated successfully.' 
+            ? 'Password reset instructions dispatched.' 
             : t('auth.reset_password_sub')}
         </p>
       </div>
@@ -59,21 +84,37 @@ export default function ForgotPassword() {
       {success ? (
         <div className="text-center mt-4">
           <div style={{ fontSize: '3rem', margin: '0.75rem 0' }}>✉️</div>
-          <p style={{ color: '#4b5563', fontSize: '0.92rem', lineHeight: '1.6' }}>
-            Password reset link has been created for <strong>{email}</strong>.
+          <p style={{ color: 'var(--color-text-secondary, #94a3b8)', fontSize: '0.92rem', lineHeight: '1.6' }}>
+            A password reset passcode has been sent to <strong>{email}</strong>.
           </p>
+
+          {previewCode && (
+            <div style={{
+              margin: '1rem 0',
+              padding: '12px 14px',
+              background: 'rgba(245, 158, 11, 0.1)',
+              border: '1px dashed #f59e0b',
+              borderRadius: '10px',
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#fbbf24', fontWeight: 600, display: 'block' }}>
+                Reset Passcode
+              </span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '6px', color: '#f59e0b', fontFamily: 'monospace' }}>
+                {previewCode}
+              </span>
+            </div>
+          )}
+
           {resetUrl && (
             <div style={{
               margin: '1.25rem 0',
               padding: '1rem',
-              background: '#f0fdf4',
-              border: '1px solid #bbf7d0',
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
               borderRadius: '12px',
-              textAlign: 'left'
+              textAlign: 'center'
             }}>
-              <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.85rem', fontWeight: 600, color: '#166534' }}>
-                🔗 Direct Reset Link:
-              </p>
               <Link
                 to={resetUrl}
                 className="btn-3d btn-3d-primary"
@@ -85,10 +126,11 @@ export default function ForgotPassword() {
                   textAlign: 'center',
                 }}
               >
-                Reset My Password Now →
+                Enter New Password Now →
               </Link>
             </div>
           )}
+
           <Link to="/login" className="btn-3d btn-3d-demo mt-3" style={{ display: 'block', textDecoration: 'none' }}>
             {t('auth.back_to_login')}
           </Link>
@@ -114,6 +156,16 @@ export default function ForgotPassword() {
               />
             </div>
           </div>
+
+          {/* Captcha Verification Widget */}
+          <CaptchaInput
+            value={captchaInput}
+            onChange={setCaptchaInput}
+            captchaCode={captchaCode}
+            onRefresh={refreshCaptcha}
+            error={captchaError}
+            label="Security Verification"
+          />
 
           <button
             type="submit"

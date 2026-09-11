@@ -1,21 +1,21 @@
 import { NextResponse } from 'next/server';
 import { findUserByEmail, createUser } from '@/lib/userStore';
-import { signToken } from '@/lib/auth';
+import { sendVerificationEmail } from '@/lib/emailService';
 
 export async function POST(req) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, educationLevel, institution, fieldOfStudy } = await req.json();
 
-    if (!email || !password || !name) {
+    if (!email || !name) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
+        { error: 'Full name and email are required.' },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
+    if (!password || password.length < 6) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
+        { error: 'Password must be at least 6 characters long.' },
         { status: 400 }
       );
     }
@@ -25,33 +25,60 @@ export async function POST(req) {
     // Check if user already exists
     const existing = await findUserByEmail(cleanEmail);
     if (existing) {
+      if (existing.isVerified) {
+        return NextResponse.json(
+          { error: 'An account with this email already exists. Please log in.' },
+          { status: 409 }
+        );
+      }
+      // If user exists but is NOT verified, we can resend them a verification code
+      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+      existing.verificationCode = newCode;
+      existing.verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+      await sendVerificationEmail({ to: cleanEmail, name: existing.name, code: newCode });
+
       return NextResponse.json(
-        { error: 'An account with this email already exists. Please log in.' },
-        { status: 409 }
+        {
+          message: 'Account is pending email verification. A new 6-digit code has been sent to your email.',
+          requiresVerification: true,
+          email: cleanEmail,
+          previewCode: newCode,
+        },
+        { status: 200 }
       );
     }
 
-    // Create user
-    const user = await createUser({
+    // Generate 6-digit verification passcode
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Create user with isVerified = false
+    const newUser = await createUser({
       name: name.trim(),
       email: cleanEmail,
       password,
+      isVerified: false,
+      verificationCode,
+      academicProfile: {
+        educationLevel: educationLevel || 'University',
+        institution: institution || '',
+        university: institution || '',
+        fieldOfStudy: fieldOfStudy || '',
+      },
     });
 
-    const token = signToken({ id: user.id, email: user.email });
+    // Send email dispatch
+    await sendVerificationEmail({
+      to: cleanEmail,
+      name: name.trim(),
+      code: verificationCode,
+    });
 
     return NextResponse.json(
       {
-        message: 'Account created successfully!',
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar,
-          isOnboarded: user.isOnboarded !== undefined ? user.isOnboarded : true,
-          academicProfile: user.academicProfile || user.academic_profile || { educationLevel: 'University' },
-        },
+        message: 'Student account created! We sent a 6-digit verification code to your email.',
+        requiresVerification: true,
+        email: cleanEmail,
+        previewCode: verificationCode,
       },
       { status: 201 }
     );

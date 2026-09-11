@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import Auth3DLayout from './Auth3DLayout';
 import GoogleAuthModal from '../../components/GoogleAuthModal/GoogleAuthModal';
+import CaptchaInput, { generateCaptchaCode } from '../../components/Captcha/CaptchaInput';
 import './Auth.css';
 
 export default function Login() {
@@ -15,16 +16,44 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+
+  // Captcha State
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [captchaInput, setCaptchaInput] = useState('');
+  const [captchaError, setCaptchaError] = useState('');
+
+  // Unverified account state
+  const [unverifiedState, setUnverifiedState] = useState(null);
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showGoogleModal, setShowGoogleModal] = useState(false);
 
+  useEffect(() => {
+    refreshCaptcha();
+  }, []);
+
+  const refreshCaptcha = () => {
+    setCaptchaCode(generateCaptchaCode());
+    setCaptchaInput('');
+    setCaptchaError('');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setCaptchaError('');
+    setUnverifiedState(null);
 
     if (!email.trim() || !password.trim()) {
       setError('Please fill in both Email Address and Password.');
+      return;
+    }
+
+    // Verify Captcha
+    if (captchaInput.trim().toUpperCase() !== captchaCode) {
+      setCaptchaError('Captcha code does not match. Please try again.');
+      refreshCaptcha();
       return;
     }
 
@@ -34,8 +63,18 @@ export default function Login() {
       setLoading(false);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Invalid email or password.');
       setLoading(false);
+      refreshCaptcha();
+
+      if (err.requiresVerification) {
+        setUnverifiedState({
+          email: err.email || email,
+          previewCode: err.previewCode,
+        });
+        setError('Your student account is pending email verification. A passcode has been sent to your email.');
+      } else {
+        setError(err.message || 'Invalid email or password.');
+      }
     }
   };
 
@@ -48,6 +87,12 @@ export default function Login() {
     }, 300);
   };
 
+  const handleGoToVerification = () => {
+    const targetEmail = encodeURIComponent(unverifiedState?.email || email);
+    const codeParam = unverifiedState?.previewCode ? `&code=${encodeURIComponent(unverifiedState.previewCode)}` : '';
+    navigate(`/signup?step=verify&email=${targetEmail}${codeParam}`);
+  };
+
   return (
     <Auth3DLayout>
       <div className="auth-3d-header">
@@ -58,6 +103,27 @@ export default function Login() {
       {error && (
         <div className="auth-3d-alert-error">
           <span>⚠️ {error}</span>
+          {unverifiedState && (
+            <button
+              type="button"
+              onClick={handleGoToVerification}
+              style={{
+                display: 'block',
+                marginTop: '8px',
+                background: '#38bdf8',
+                color: '#0f172a',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 12px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              Enter Verification Code Now →
+            </button>
+          )}
         </div>
       )}
 
@@ -141,6 +207,16 @@ export default function Login() {
           </div>
         </div>
 
+        {/* Captcha Verification Widget */}
+        <CaptchaInput
+          value={captchaInput}
+          onChange={setCaptchaInput}
+          captchaCode={captchaCode}
+          onRefresh={refreshCaptcha}
+          error={captchaError}
+          label="Security Verification"
+        />
+
         {/* Checkbox: Remember me */}
         <div className="checkbox-3d-wrapper">
           <label className="checkbox-3d-label">
@@ -189,7 +265,7 @@ export default function Login() {
 
       {/* Footer link */}
       <div className="auth-3d-footer">
-        <p>{t('auth.dont_have_account')} <Link to="/signup" className="link-3d-signup">{t('auth.sign_up_link')}</Link></p>
+        <p>New student? <Link to="/signup" className="link-3d-signup">Create Account</Link></p>
       </div>
 
       {/* Interactive Google Auth Modal */}

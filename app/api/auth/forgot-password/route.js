@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { findUserByEmail, createPasswordResetToken } from '@/lib/userStore';
+import { sendPasswordResetEmail } from '@/lib/emailService';
 
 export async function POST(req) {
   try {
@@ -24,11 +25,19 @@ export async function POST(req) {
 
     const { token, expiresAt } = await createPasswordResetToken(cleanEmail);
 
+    // Send email dispatch
+    await sendPasswordResetEmail({
+      to: cleanEmail,
+      name: user.name || 'Student',
+      code: token,
+    });
+
     return NextResponse.json({
       success: true,
-      message: 'Password reset instructions have been sent to your email.',
+      message: 'Password reset code has been sent to your email.',
       resetToken: token,
       resetUrl: `/reset-password/${token}`,
+      previewCode: token,
       expiresAt,
     });
   } catch (error) {

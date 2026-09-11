@@ -21,7 +21,8 @@ export function AuthProvider({ children }) {
         name: 'Demo Student',
         email: 'demo@learnozi.com',
         isOnboarded: true,
-        academicProfile: { educationLevel: 'University', university: 'NUST' }
+        isVerified: true,
+        academicProfile: { educationLevel: 'University', university: 'NUST', institution: 'NUST' },
       });
       setLoading(false);
       return;
@@ -36,7 +37,11 @@ export function AuthProvider({ children }) {
         // Fallback user if server token is valid locally
         const storedUser = localStorage.getItem('user_data');
         if (storedUser) {
-          try { setUser(JSON.parse(storedUser)); } catch (e) { localStorage.removeItem('token'); }
+          try {
+            setUser(JSON.parse(storedUser));
+          } catch (e) {
+            localStorage.removeItem('token');
+          }
         } else {
           localStorage.removeItem('token');
         }
@@ -53,23 +58,56 @@ export function AuthProvider({ children }) {
       setUser(userData);
       return userData;
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Login failed. Check your credentials.';
+      const resData = err.response?.data;
+      if (resData?.requiresVerification) {
+        const customErr = new Error(resData.error || 'Email verification required');
+        customErr.requiresVerification = true;
+        customErr.email = resData.email || email;
+        customErr.previewCode = resData.previewCode;
+        throw customErr;
+      }
+      const errorMsg = resData?.error || resData?.message || 'Login failed. Check your credentials.';
       throw new Error(errorMsg);
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (payload) => {
     try {
-      const res = await axios.post('/api/auth/register', { name, email, password });
+      // payload can be an object or (name, email, password)
+      const dataToSend = typeof payload === 'string'
+        ? { name: payload, email: arguments[1], password: arguments[2] }
+        : payload;
+
+      const res = await axios.post('/api/auth/register', dataToSend);
+      return res.data;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Registration failed. Try again.';
+      throw new Error(errorMsg);
+    }
+  };
+
+  const verifyCode = async (email, code) => {
+    try {
+      const res = await axios.post('/api/auth/verify-code', { email, code });
       const { token, user: userData } = res.data;
       if (token) {
         localStorage.setItem('token', token);
         localStorage.setItem('user_data', JSON.stringify(userData));
         setUser(userData);
       }
-      return userData;
+      return res.data;
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Registration failed. Try again.';
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Verification failed. Please check the code.';
+      throw new Error(errorMsg);
+    }
+  };
+
+  const resendCode = async (email) => {
+    try {
+      const res = await axios.post('/api/auth/resend-code', { email });
+      return res.data;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to resend code.';
       throw new Error(errorMsg);
     }
   };
@@ -80,7 +118,8 @@ export function AuthProvider({ children }) {
       name: 'Demo Student',
       email: 'demo@learnozi.com',
       isOnboarded: true,
-      academicProfile: { educationLevel: 'University', university: 'NUST' }
+      isVerified: true,
+      academicProfile: { educationLevel: 'University', university: 'NUST', institution: 'NUST' },
     };
     localStorage.setItem('token', 'demo-mock-jwt-token-12345');
     localStorage.setItem('user_data', JSON.stringify(demoData));
@@ -119,7 +158,20 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, setAuthSession, demoLogin, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        verifyCode,
+        resendCode,
+        googleLogin,
+        setAuthSession,
+        demoLogin,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

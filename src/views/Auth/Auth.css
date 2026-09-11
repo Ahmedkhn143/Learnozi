@@ -746,3 +746,32 @@
     padding: 0.85rem 0.35rem;
   }
 }
+
+/* Verification Badge & Mailbox Preview */
+.auth-verify-icon-badge {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 2px solid rgba(56, 189, 248, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.input-3d-select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.dev-mail-preview-box {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
