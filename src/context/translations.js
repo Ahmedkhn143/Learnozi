@@ -59,74 +59,110 @@ export const translations = {
     },
     landing: {
       badge: "Pakistan's AI Study Companion",
-      hero_title_1: "Studying made",
-      hero_title_2: "easy and smart",
-      hero_sub: "AI that explains, a planner that guides — with you until the exam.",
-      hero_urdu: "Smart Study, Better Results",
-      btn_signup: "Create Free Account →",
-      btn_how: "See how it works ↓",
-      note_free: "Completely free. No credit card required.",
+      hero_title_1: "Study smarter.",
+      hero_title_2: "Ace every exam.",
+      hero_sub: "Your AI tutor, study planner, flashcards and focus coach — built around your syllabus.",
+      hero_urdu: "ذہین مطالعہ، شاندار کامیابی",
+      btn_signup: "Start Studying Free →",
+      btn_how: "See How It Works ▶",
+      trust_1: "No credit card required",
+      trust_2: "Free to start",
+      trust_3: "English + Urdu",
+      trust_4: "Built for Pakistani students",
+      social_proof_num: "10,000+",
+      social_proof_text: "students are studying smarter",
       
       ai_bot_name: "Learnozi AI",
-      ai_bot_status: "● Online",
+      ai_bot_status: "Online",
       ai_msg_user: "Explain Newton's 2nd Law simply",
-      ai_msg_reply: "Newton's second law states that the acceleration of an object is directly proportional to the net force acting on it.\n\nF = ma (Force = Mass × Acceleration)",
+      ai_msg_reply: "Newton's 2nd law states that acceleration is directly proportional to net force:\n\nF = ma (Force = Mass × Acceleration)\n\nIn simple words, the heavier an object is, the harder you have to push it to move!",
 
       stats: {
-        ai: "AI Features",
+        ai: "AI Study Tools",
         lang: "Language Support",
-        plan: "Forever Basic Plan",
+        plan: "Basic Plan",
         tutor: "AI Tutor Available"
       },
 
-      feat_subtitle: "Everything a student needs<br />in one place",
-      feat_desc: "ChatGPT is generic — Learnozi is built specifically for students.",
+      feat_badge: "OUR FEATURES",
+      feat_title: "Everything a student needs in one place",
+      feat_desc: "From understanding difficult concepts to staying on track — Learnozi has everything you need to succeed.",
+      feat_doodle: "All core study tools are free to use! ⤴",
       features_list: {
-        1: { title: "AI Concept Explainer", desc: "Type any topic — AI provides simple explanations, examples, and summaries." },
-        2: { title: "AI Flashcards", desc: "AI automatically generates flashcards for your topics. Review daily for better retention." },
-        3: { title: "Pomodoro Focus Timer", desc: "Study for 25 mins, break for 5 mins. Track your focus time and build streaks." },
-        4: { title: "Smart Study Planner", desc: "Enter your exam date and subjects — AI schedules your entire study plan." },
-        5: { title: "Progress Dashboard", desc: "Track your focus time, flashcards, and AI usage comprehensively in one place." },
-        6: { title: "Curriculum Focused", desc: "Ideal for Matric, FSc, MDCAT, CSS — perfectly aligns with Pakistani syllabuses." }
+        1: { title: "AI Concept Explainer", desc: "Stuck on a topic? Ask Learnozi for clear, step-by-step explanations and real-world examples." },
+        2: { title: "AI Flashcards", desc: "Turn your notes into smart flashcards and quiz yourself anytime with active recall." },
+        3: { title: "Smart Study Planner", desc: "Get a personalized study plan based on your subjects and upcoming exam dates." },
+        4: { title: "Pomodoro Focus Timer", desc: "Study for 25 mins, break for 5 mins. Build better focus habits and track daily streaks." },
+        5: { title: "Progress Dashboard", desc: "Track your progress, identify your weak subjects, and stay motivated every single day." },
+        6: { title: "Pakistan Curriculum Focused", desc: "Ideal for Matric, FSc, MDCAT, CSS — perfectly aligned with Pakistani board syllabi." }
       },
 
-      how_title: "Get started in 3 steps",
+      how_badge: "HOW IT WORKS",
+      how_title: "Get started in 3 simple steps",
+      how_sub: "It only takes a minute to set up. Let's get you on your way!",
+      how_doodle: "Your goals. Our AI. Better results. ⤴",
       how_steps: {
-        1: { title: "Create an Account", desc: "Standard email signup. Ready in 60 seconds." },
-        2: { title: "Enter Your Details", desc: "Add your class, subjects, and exam dates for a tailored plan." },
-        3: { title: "Start Studying", desc: "Ask the AI, create flashcards, and launch your focus timer." }
+        1: { num: "01", title: "Tell us what you're studying", desc: "Add your class, subjects, exam and syllabus in seconds." },
+        2: { num: "02", title: "Get your personalized plan", desc: "AI creates your study roadmap and schedules daily micro-goals." },
+        3: { num: "03", title: "Study with your AI companion", desc: "Learn, practice flashcards, track progress and ace your exams." }
       },
 
-      compare_title: "Why better than ChatGPT?",
-      compare_rows: {
-        1: "Local Language Context",
-        2: "Syllabus Aware",
-        3: "Built-in Study Planner",
-        4: "Automated Flashcards",
-        5: "Focus Timer + Streaks",
-        6: "Designed exactly for Students",
-        7: "Free to Use"
-      },
-      compare_partial: "Partial",
+      pak_badge: "BUILT FOR PAKISTANI STUDENTS",
+      pak_title: "Built for how Pakistani students actually study.",
+      pak_sub: "From Matric and FSc to MDCAT, ECAT and university exams, Learnozi helps you study around your subjects, syllabus and goals.",
+      pak_doodle: "Same dreams. Smarter tools. 🇵🇰",
 
-      cta_title: "Start studying smarter today",
-      cta_sub: "Completely free. No credit card required. Sign up now.",
+      why_badge: "WHY CHOOSE LEARNOZI",
+      why_title: "Designed for your success.",
+      why_sub: "More than just answers — Learnozi helps you build better study habits, deeper understanding and real results.",
+      why_pillars: {
+        1: "Syllabus-aware content",
+        2: "Local language support",
+        3: "Personalized study plans",
+        4: "Track your progress",
+        5: "Stay consistent with streaks"
+      },
+
+      compare_matrix_title: "Learnozi vs ChatGPT & Others",
+      compare_matrix_sub: "See why generic AI tools and traditional academies can't match a dedicated study companion.",
+      compare_headers: {
+        feature: "Feature & Capability",
+        learnozi: "Learnozi (All-in-One)",
+        chatgpt: "ChatGPT (Free / Plus)",
+        tuition: "Traditional Academies",
+        youtube: "YouTube & Web"
+      },
+
+      testimonials_badge: "STUDENT STORIES",
+      testimonials_title: "Loved by Students Across Pakistan 🇵🇰",
+      testimonials_link: "Real students. Real results. →",
+
+      faq_badge: "FAQ",
+      faq_title: "Frequently Asked Questions",
+      faq_sub: "Find quick answers to common questions about Learnozi.",
+
+      cta_title: "Your smarter study journey starts here.",
+      cta_sub: "Free to start. No credit card required.",
       cta_btn: "Create Free Account →",
-      cta_note: "The free plan includes 10 AI explanations daily."
+      cta_doodle: "Better habits. Brighter future. ✨",
+
+      footer_tagline: "Pakistan's AI study companion for better results.",
+      footer_made: "Made in Pakistan 🇵🇰",
+      footer_rights: "All rights reserved."
     }
   },
   ur: {
     nav: {
-      features: "Features",
-      why_learnozi: "Why Learnozi",
-      login: "Log In",
-      signup: "Shuru Karo — Free",
-      dashboard: "Dashboard",
-      planner: "Study Planner",
-      flashcards: "Flashcards",
-      ai_explainer: "AI Explainer",
-      timer: "Timer",
-      logout: "Log Out"
+      features: "فیچرز",
+      why_learnozi: "Learnozi کیوں؟",
+      login: "لاگ ان",
+      signup: "مفت شروع کریں",
+      dashboard: "ڈیش بورڈ",
+      planner: "اسٹڈی پلانر",
+      flashcards: "فلیش کارڈز",
+      ai_explainer: "AI استاد",
+      timer: "فوکس ٹائمر",
+      logout: "لاگ آؤٹ"
     },
     auth: {
       welcome_title: "Learnozi Mein Khush Aamdeed! ✨",
@@ -174,61 +210,97 @@ export const translations = {
       focused: "💜 100% Full Focus"
     },
     landing: {
-      badge: "Pakistan ka AI Study Companion",
-      hero_title_1: "Padhna hua",
-      hero_title_2: "asan aur smart",
-      hero_sub: "AI jo samjhata hai, planner jo guide karta hai — exam tak saath.",
-      hero_urdu: "ذہین مطالعہ، بہتر نتائج",
-      btn_signup: "Muft Account Banao →",
-      btn_how: "Dekho kaise kaam karta hai ↓",
-      note_free: "Bilkul free. Koi credit card nahi.",
-      
+      badge: "پاکستان کا AI اسٹڈی ساتھی",
+      hero_title_1: "ذہانت سے پڑھیں،",
+      hero_title_2: "ہر امتحان میں ٹاپ کریں۔",
+      hero_sub: "آپ کا ذاتی AI استاد، اسٹڈی پلانر، فلیش کارڈز اور فوکس کوچ — آپ کے سلیبس کے عین مطابق۔",
+      hero_urdu: "سمارٹ پڑھائی، بہترین نتائج",
+      btn_signup: "مفت پڑھائی شروع کریں →",
+      btn_how: "طریقہ کار دیکھیں ▶",
+      trust_1: "کریڈٹ کارڈ کی ضرورت نہیں",
+      trust_2: "مفت رجسٹریشن",
+      trust_3: "اردو + انگلش سپورٹ",
+      trust_4: "پاکستانی طلباء کیلئے خاص ڈیزائن",
+      social_proof_num: "10,000+",
+      social_proof_text: "طلباء کامیابی سے پڑھ رہے ہیں",
+
       ai_bot_name: "Learnozi AI",
-      ai_bot_status: "● Online",
-      ai_msg_user: "Newton ka 2nd law Urdu mein explain karo",
-      ai_msg_reply: "Newton ka doosra qanoon kehta hai ke kisi cheez ki speed mein tabdeeli us par lagi taqat ke barabar hoti hai.\n\nF = ma — Taqat = Mass × Acceleration",
+      ai_bot_status: "آن لائن",
+      ai_msg_user: "نیوٹن کا دوسرا قانون آسان الفاظ میں سمجھائیں",
+      ai_msg_reply: "نیوٹن کا دوسرا قانون: کسی جسم پر لگنے والی قوت اس کے ماس اور ایکسلریشن کا حاصل ضرب ہے:\n\nF = ma\n\nآسان الفاظ میں: جتنا وزنی جسم ہوگا، اسے ہلانے کیلئے اتنی ہی زیادہ طاقت درکار ہوگی!",
 
       stats: {
-        ai: "AI Features",
-        lang: "Language Support",
-        plan: "Forever Basic Plan",
-        tutor: "AI Tutor Available"
+        ai: "AI اسٹڈی ٹولز",
+        lang: "زبانوں کی سپورٹ",
+        plan: "بیسک پلان",
+        tutor: "24/7 AI استاد"
       },
 
-      feat_subtitle: "Har student ki zaroorat<br />ek jagah",
-      feat_desc: "ChatGPT generic hai — Learnozi Pakistani students ke liye bana hai.",
+      feat_badge: "ہمارے فیچرز",
+      feat_title: "ایک طالب علم کی ہر ضرورت، ایک جگہ",
+      feat_desc: "مشکل تصورات کو سمجھنے سے لے کر روزانہ ٹائم ٹیبل بنانے تک — Learnozi میں ہر چیز موجود ہے۔",
+      feat_doodle: "تمام بنیادی ٹولز بالکل مفت ہیں! ⤴",
       features_list: {
-        1: { title: "AI Concept Explainer", desc: "Koi bhi topic likho — AI Urdu ya English mein explanation, example aur summary deta hai." },
-        2: { title: "AI Flashcards", desc: "Topic likho — AI automatically flashcards bana deta hai. Daily review karo, exam se pehle yaad rahega." },
-        3: { title: "Pomodoro Focus Timer", desc: "25 min study, 5 min break. Dashboard pe tera study time track hota hai. Streak banao." },
-        4: { title: "Smart Study Planner", desc: "Exam date daalo, subjects batao — AI tera poora schedule bana deta hai." },
-        5: { title: "Progress Dashboard", desc: "Focus time, AI uses, flashcard sets — sab ek jagah dikhta hai. Real data, koi hardcoded nahi." },
-        6: { title: "Pakistan Focused", desc: "Matric, FSc, MDCAT, CSS — Pakistani syllabus ke mutabiq. Urdu mein baat karo, Urdu mein samjho." }
+        1: { title: "AI کانسیپٹ ایکسپلینر", desc: "کسی بھی ٹاپک پر اٹک جائیں؟ اردو یا انگلش میں مثالوں کے ساتھ آسان وضاحت حاصل کریں۔" },
+        2: { title: "AI سمارٹ فلیش کارڈز", desc: "اپنے نوٹس کو خودکار فلیش کارڈز میں تبدیل کریں اور امتحان سے پہلے فوری دہرائی کریں۔" },
+        3: { title: "سمارٹ اسٹڈی پلانر", desc: "امتحان کی تاریخ اور مضامین بتائیں — AI روزانہ کا ٹارگٹ اور شیڈول خود تیار کرے گا۔" },
+        4: { title: "پومودورو فوکس ٹائمر", desc: "25 منٹ فوکس، 5 منٹ بریک۔ اپنی مستقل مزاجی اور اسٹڈی اسٹریکس میں اضافہ کریں۔" },
+        5: { title: "پروگریس ڈیش بورڈ", desc: "اپنی پڑھائی کا وقت، کمزور مضامین اور ہفتہ وار بہتری کا لائیو گراف دیکھیں۔" },
+        6: { title: "پاکستانی نصاب کے مطابق", desc: "میٹرک، ایف ایس سی، ایم ڈی کیٹ اور سی ایس ایس کے بورڈ سلیبس کے ساتھ 100 فیصد ہم آہنگ۔" }
       },
 
-      how_title: "3 steps mein shuru karo",
+      how_badge: "استعمال کا طریقہ",
+      how_title: "3 آسان مراحل میں شروعات کریں",
+      how_sub: "صرف ایک منٹ میں اکاؤنٹ بنا کر اپنی پڑھائی کا آغاز کریں۔",
+      how_doodle: "آپ کے مقاصد۔ ہمارا AI۔ شاندار نتائج! ⤴",
       how_steps: {
-        1: { title: "Account Banao — Free", desc: "Email se signup karo. 60 seconds mein ready." },
-        2: { title: "Apni Details Daalo", desc: "Class, subjects, exam date batao. AI plan banata hai." },
-        3: { title: "Padhna Shuru Karo", desc: "AI se poocho, flashcards banao, timer chalao." }
+        1: { num: "01", title: "اپنی کلاس اور مضامین منتخب کریں", desc: "اپنی کلاس، بورڈ اور مضامین درج کریں۔" },
+        2: { num: "02", title: "ذاتی اسٹڈی پلان حاصل کریں", desc: "AI آپ کے امتحانی شیڈول کے مطابق پڑھائی کا لائحہ عمل تیار کرتا ہے۔" },
+        3: { num: "03", title: "AI ساتھی کے ساتھ پڑھیں", desc: "سمجھیں، فلیش کارڈز سے یاد کریں اور ٹیسٹ میں شاندار نمبر لائیں۔" }
       },
 
-      compare_title: "ChatGPT se better kyun?",
-      compare_rows: {
-        1: "Urdu mein explain karta hai",
-        2: "Pakistani syllabus aware",
-        3: "Study Planner built-in",
-        4: "AI Flashcards",
-        5: "Focus Timer + Streak",
-        6: "Student ke liye design",
-        7: "Free to use"
-      },
-      compare_partial: "Partial",
+      pak_badge: "پاکستانی طلباء کیلئے مخصوص",
+      pak_title: "پاکستانی طلباء کی پڑھائی کے انداز پر مبنی۔",
+      pak_sub: "میٹرک اور ایف ایس سی سے لے کر MDCAT، ECAT اور یونیورسٹی امتحانات تک — Learnozi آپ کے مخصوص نصاب پر کام کرتا ہے۔",
+      pak_doodle: "ایک جیسے خواب، سمارٹ ٹولز! 🇵🇰",
 
-      cta_title: "Aaj se smarter padhna shuru karo",
-      cta_sub: "Bilkul free. Koi credit card nahi. Abhi signup karo.",
-      cta_btn: "Muft Account Banao →",
-      cta_note: "Free plan mein 10 AI explanations daily."
+      why_badge: "LEARNOZI ہی کیوں؟",
+      why_title: "آپ کی کامیابی کیلئے ڈیزائن کیا گیا",
+      why_sub: "صرف سوالوں کے جوابات نہیں — بلکہ بہتر عادات، گہری تفہیم اور حقیقی نتائج۔",
+      why_pillars: {
+        1: "بورڈ سلیبس کے عین مطابق",
+        2: "اردو اور رومن اردو سپورٹ",
+        3: "ذاتی نوعیت کا امتحانی شیڈول",
+        4: "پروگریس اور اسکور ٹریکنگ",
+        5: "روزانہ اسٹریک اور ڈسپلن"
+      },
+
+      compare_matrix_title: "Learnozi بمقابلہ ChatGPT اور دیگر ذرائع",
+      compare_matrix_sub: "دیکھیں کہ عام AI چیٹ باٹس اور روایتی اکیڈمیاں کیوں ایک مخصوص اسٹڈی ساتھی کا مقابلہ نہیں کر سکتیں۔",
+      compare_headers: {
+        feature: "فیچرز اور صلاحیتیں",
+        learnozi: "Learnozi (مکمل حل)",
+        chatgpt: "ChatGPT (عام چیٹ)",
+        tuition: "روایتی اکیڈمیاں",
+        youtube: "یوٹیوب اور ویب"
+      },
+
+      testimonials_badge: "طلباء کے تاثرات",
+      testimonials_title: "پورے پاکستان کے طلباء کا بھروسہ 🇵🇰",
+      testimonials_link: "اصلی طلباء۔ حقیقی نتائج۔ →",
+
+      faq_badge: "اکثر پوچھے گئے سوالات",
+      faq_title: "عام سوالات کے فوری جوابات",
+      faq_sub: "Learnozi کے متعلق اپنے سوالات کا حل تلاش کریں۔",
+
+      cta_title: "آپ کی شاندار پڑھائی کا سفر آج شروع ہوتا ہے۔",
+      cta_sub: "مفت شروعات۔ کسی کریڈٹ کارڈ کی ضرورت نہیں۔",
+      cta_btn: "مفت اکاؤنٹ بنائیں →",
+      cta_doodle: "بہتر عادات۔ روشن مستقبل! ✨",
+
+      footer_tagline: "بہتر امتحانی نتائج کیلئے پاکستان کا AI اسٹڈی ساتھی۔",
+      footer_made: "پاکستان میں محبت سے تیار شدہ 🇵🇰",
+      footer_rights: "جملہ حقوق محفوظ ہیں۔"
     }
   }
 };
