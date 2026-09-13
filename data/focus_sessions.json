@@ -1,0 +1,34 @@
+[
+  {
+    "id": "ecd7f417-bfa6-4526-93cb-91a0e1ac4f3d",
+    "userId": "demo_user_123",
+    "subject": "Quantum Mechanics",
+    "durationMin": 25,
+    "completed": true,
+    "completedAt": "2026-09-13T11:11:45.152Z"
+  },
+  {
+    "id": "e475f3a2-9ee5-4202-82fb-513ac242fca4",
+    "userId": "demo_user_123",
+    "subject": "Quantum Mechanics",
+    "durationMin": 25,
+    "completed": true,
+    "completedAt": "2026-09-13T11:09:59.444Z"
+  },
+  {
+    "id": "seed_focus_1",
+    "userId": "demo_user_123",
+    "subject": "Organic Chemistry",
+    "durationMin": 25,
+    "completed": true,
+    "completedAt": "2026-09-13T08:09:58.198Z"
+  },
+  {
+    "id": "seed_focus_2",
+    "userId": "demo_user_123",
+    "subject": "Calculus III",
+    "durationMin": 50,
+    "completed": true,
+    "completedAt": "2026-09-12T09:09:58.198Z"
+  }
+]

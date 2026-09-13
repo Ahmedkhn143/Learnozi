@@ -1,37 +1,123 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import './Dashboard.css';
+
+function formatTimeAgo(dateString) {
+  if (!dateString) return 'Just now';
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffSec = Math.floor((now - date) / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Yesterday';
+  return `${diffDays} days ago`;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
   const userName = user?.name || 'Learner';
 
   const [stats, setStats] = useState({
-    focusHours: 14.5,
-    streakDays: 6,
+    focusHours: 2.5,
+    streakDays: 1,
     flashcardsMastered: 42,
     totalFlashcards: 50,
     upcomingExamsCount: 2
   });
 
-  const subjects = [
+  const [subjects, setSubjects] = useState([
     { name: 'Organic Chemistry', progress: 78, color: '#6366f1', totalHours: 18 },
     { name: 'Quantum Mechanics', progress: 60, color: '#06b6d4', totalHours: 12 },
     { name: 'Calculus III', progress: 85, color: '#10b981', totalHours: 24 },
     { name: 'Data Structures', progress: 45, color: '#f59e0b', totalHours: 8 }
-  ];
+  ]);
 
-  const upcomingExams = [
-    { title: 'Organic Chemistry Midterm', date: '2026-09-05', daysLeft: 4, urgency: 'high', subject: 'Chemistry' },
-    { title: 'Calculus III Final', date: '2026-09-12', daysLeft: 11, urgency: 'medium', subject: 'Math' }
-  ];
+  const [upcomingExams, setUpcomingExams] = useState([
+    { title: 'Organic Chemistry Midterm', date: '2026-09-20', daysLeft: 7, urgency: 'high', subject: 'Chemistry' },
+    { title: 'Calculus III Final', date: '2026-09-28', daysLeft: 15, urgency: 'medium', subject: 'Math' }
+  ]);
 
-  const recentActivity = [
+  const [recentActivity, setRecentActivity] = useState([
     { title: 'AI Chat: Explained Bayes Theorem', time: '2 hours ago', icon: '✨' },
-    { title: 'Completed 25m Focus Session', time: '4 hours ago', icon: '⏱️' },
+    { title: 'Completed 25m Focus Session in Organic Chemistry', time: '4 hours ago', icon: '⏱️' },
     { title: 'Reviewed 15 Organic Chemistry Flashcards', time: 'Yesterday', icon: '🃏' }
-  ];
+  ]);
+
+  // Live Focus API & Academics Integration
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // 1. Fetch live focus metrics and sessions
+    axios
+      .get('/api/focus', {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 4000
+      })
+      .then((res) => {
+        const data = res.data;
+        if (data) {
+          const liveHours = Number(((data.weekMinutes || 0) / 60).toFixed(1));
+          const liveStreak = data.streakDays !== undefined ? data.streakDays : 1;
+
+          setStats((prev) => ({
+            ...prev,
+            focusHours: liveHours > 0 ? liveHours : prev.focusHours,
+            streakDays: liveStreak > 0 ? liveStreak : prev.streakDays
+          }));
+
+          // Dynamically populate recent activity from real logged sessions!
+          if (Array.isArray(data.sessions) && data.sessions.length > 0) {
+            const liveActivities = data.sessions.slice(0, 3).map((s) => ({
+              title: `Completed ${s.durationMin}m Focus Session (${s.subject})`,
+              time: formatTimeAgo(s.completedAt),
+              icon: '⏱️'
+            }));
+
+            setRecentActivity((prev) => {
+              const combined = [...liveActivities];
+              prev.forEach((item) => {
+                if (combined.length < 4 && !combined.some((c) => c.title === item.title)) {
+                  combined.push(item);
+                }
+              });
+              return combined;
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Dashboard focus stats fetch notice:', err.message);
+      });
+
+    // 2. Fetch live academics for upcoming courses / exams
+    axios
+      .get('/api/academics', {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 4000
+      })
+      .then((res) => {
+        if (res.data?.semesters && Array.isArray(res.data.semesters)) {
+          const allCourses = [];
+          res.data.semesters.forEach((s) => {
+            if (Array.isArray(s.courses)) allCourses.push(...s.courses);
+          });
+          if (allCourses.length > 0) {
+            setStats((prev) => ({
+              ...prev,
+              upcomingExamsCount: allCourses.length
+            }));
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="dashboard-view animate-fade-in">
@@ -41,15 +127,17 @@ export default function Dashboard() {
           <div className="welcome-badge">
             <span>🔥 {stats.streakDays} DAY FOCUS STREAK</span>
           </div>
-          <h1>Welcome back, <span className="gradient-text">{userName}</span> 👋</h1>
+          <h1>
+            Welcome back, <span className="gradient-text">{userName}</span> 👋
+          </h1>
           <p>You are on track to hit your study goals this week. Keep the momentum going!</p>
 
           <div className="welcome-actions mt-3">
-            <Link to="/ai-explainer" className="btn btn-primary btn-sm">
-              <span>✨ Ask AI Assistant</span>
-            </Link>
-            <Link to="/timer" className="btn btn-secondary btn-sm">
+            <Link to="/timer" className="btn btn-primary btn-sm">
               <span>⏱️ Start Focus Room</span>
+            </Link>
+            <Link to="/ai-explainer" className="btn btn-secondary btn-sm">
+              <span>✨ Ask AI Assistant</span>
             </Link>
             <Link to="/planner" className="btn btn-ghost btn-sm">
               <span>📅 View Planner</span>
@@ -59,7 +147,9 @@ export default function Dashboard() {
 
         <div className="welcome-quote-card glass-card">
           <span className="quote-icon">💡</span>
-          <p className="quote-text">"Success isn't always about greatness. It's about consistency. Consistent hard work leads to success."</p>
+          <p className="quote-text">
+            "Success isn't always about greatness. It's about consistency. Consistent hard work leads to success."
+          </p>
           <span className="quote-author">— Daily AI Motivation</span>
         </div>
       </div>
@@ -68,12 +158,12 @@ export default function Dashboard() {
       <div className="grid-4 mt-4">
         <div className="glass-card glass-card-hover stat-widget">
           <div className="stat-header">
-            <span className="stat-title">Focus Time</span>
+            <span className="stat-title">Focus Time (This Week)</span>
             <div className="stat-icon-wrap primary">⏱️</div>
           </div>
           <div className="stat-value">{stats.focusHours} hrs</div>
           <div className="stat-footer">
-            <span className="stat-trend positive">↑ +2.5 hrs</span> vs last week
+            <span className="stat-trend positive">Live Sync Active</span>
           </div>
         </div>
 
@@ -84,7 +174,7 @@ export default function Dashboard() {
           </div>
           <div className="stat-value">{stats.streakDays} Days</div>
           <div className="stat-footer">
-            <span className="stat-trend positive">Best record: 12 days</span>
+            <span className="stat-trend positive">Consecutive Study Days</span>
           </div>
         </div>
 
@@ -93,10 +183,15 @@ export default function Dashboard() {
             <span className="stat-title">Flashcards Mastered</span>
             <div className="stat-icon-wrap cyan">🃏</div>
           </div>
-          <div className="stat-value">{stats.flashcardsMastered} / {stats.totalFlashcards}</div>
+          <div className="stat-value">
+            {stats.flashcardsMastered} / {stats.totalFlashcards}
+          </div>
           <div className="stat-footer">
             <div className="mini-progress-bg">
-              <div className="mini-progress-fill" style={{ width: `${(stats.flashcardsMastered / stats.totalFlashcards) * 100}%` }} />
+              <div
+                className="mini-progress-fill"
+                style={{ width: `${(stats.flashcardsMastered / stats.totalFlashcards) * 100}%` }}
+              />
             </div>
           </div>
         </div>
@@ -108,7 +203,7 @@ export default function Dashboard() {
           </div>
           <div className="stat-value">{stats.upcomingExamsCount} Tests</div>
           <div className="stat-footer">
-            <span className="stat-trend urgent">Next in 4 Days</span>
+            <span className="stat-trend urgent">Next in 7 Days</span>
           </div>
         </div>
       </div>
@@ -119,7 +214,9 @@ export default function Dashboard() {
         <div className="glass-card dashboard-card">
           <div className="card-header-flex">
             <h3>🎓 Subject Mastery</h3>
-            <Link to="/academics" className="view-all-link">Manage →</Link>
+            <Link to="/academics" className="view-all-link">
+              Manage →
+            </Link>
           </div>
 
           <div className="subject-list mt-3">
@@ -147,7 +244,9 @@ export default function Dashboard() {
         <div className="glass-card dashboard-card">
           <div className="card-header-flex">
             <h3>📅 Upcoming Exams & Deadlines</h3>
-            <Link to="/planner" className="view-all-link">Planner →</Link>
+            <Link to="/planner" className="view-all-link">
+              Planner →
+            </Link>
           </div>
 
           <div className="exam-list mt-3">
@@ -160,10 +259,14 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h4 className="exam-title">{exam.title}</h4>
-                    <span className="exam-date">Date: {exam.date} • {exam.subject}</span>
+                    <span className="exam-date">
+                      Date: {exam.date} • {exam.subject}
+                    </span>
                   </div>
                 </div>
-                <Link to="/planner" className="btn btn-secondary btn-sm">Prep Plan</Link>
+                <Link to="/planner" className="btn btn-secondary btn-sm">
+                  Prep Plan
+                </Link>
               </div>
             ))}
 
@@ -181,13 +284,17 @@ export default function Dashboard() {
         <div className="glass-card dashboard-card">
           <div className="card-header-flex">
             <h3>🃏 Quick Flashcard Review</h3>
-            <Link to="/flashcards" className="view-all-link">All Decks →</Link>
+            <Link to="/flashcards" className="view-all-link">
+              All Decks →
+            </Link>
           </div>
 
           <div className="quick-flashcard-box mt-3 text-center">
             <span className="badge badge-cyan mb-2">Organic Chemistry Deck</span>
             <h4>Q: What is an electrophile in organic reactions?</h4>
-            <p className="text-muted mt-1" style={{ fontSize: '0.88rem' }}>Click below to test your recall!</p>
+            <p className="text-muted mt-1" style={{ fontSize: '0.88rem' }}>
+              Click below to test your recall!
+            </p>
             <div className="mt-3">
               <Link to="/flashcards" className="btn btn-primary btn-sm">
                 🔄 Flip Card & Review
