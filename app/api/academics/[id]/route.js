@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { getAuthUser } from '@/lib/auth';
+import { deleteSemester } from '@/lib/academicsStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,16 +12,10 @@ export async function DELETE(req, { params }) {
     const resolvedParams = await params;
     const { id } = resolvedParams;
 
-    const { error } = await supabase
-      .from('semesters')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id);
-
-    if (error) throw error;
-
+    await deleteSemester(user.id, id);
     return NextResponse.json({ message: 'Semester deleted successfully' });
   } catch (error) {
+    console.error('Academics DELETE Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

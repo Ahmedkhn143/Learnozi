@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sem_spring_2026",
+    "userId": "demo_user_123",
+    "name": "Spring 2026",
+    "startDate": "2026-02-01",
+    "endDate": "2026-06-30",
+    "courses": [
+      {
+        "id": "course_org_chem",
+        "semesterId": "sem_spring_2026",
+        "name": "Organic Chemistry",
+        "code": "CHEM-201",
+        "creditHours": 4,
+        "targetGrade": "A",
+        "actualGrade": ""
+      },
+      {
+        "id": "course_calc_3",
+        "semesterId": "sem_spring_2026",
+        "name": "Calculus III",
+        "code": "MATH-203",
+        "creditHours": 3,
+        "targetGrade": "A",
+        "actualGrade": ""
+      },
+      {
+        "id": "course_dsa",
+        "semesterId": "sem_spring_2026",
+        "name": "Data Structures & Algorithms",
+        "code": "CS-210",
+        "creditHours": 4,
+        "targetGrade": "A",
+        "actualGrade": ""
+      }
+    ]
+  }
+]

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { getAuthUser } from '@/lib/auth';
-import crypto from 'crypto';
+import { addCourse } from '@/lib/academicsStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,36 +17,17 @@ export async function POST(req, { params }) {
       return NextResponse.json({ error: 'Course name and credit hours are required' }, { status: 400 });
     }
 
-    const courseId = crypto.randomUUID();
+    const course = await addCourse(user.id, semesterId, {
+      name,
+      code: code || '',
+      creditHours,
+      targetGrade: targetGrade || '',
+      actualGrade: actualGrade || ''
+    });
 
-    const { data: course, error } = await supabase
-      .from('courses')
-      .insert({
-        id: courseId,
-        semester_id: semesterId,
-        name,
-        code: code || '',
-        credit_hours: parseInt(creditHours, 10),
-        target_grade: targetGrade || '',
-        actual_grade: actualGrade || '',
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return NextResponse.json({
-      course: {
-        _id: course.id,
-        id: course.id,
-        name: course.name,
-        code: course.code,
-        creditHours: course.credit_hours,
-        targetGrade: course.target_grade,
-        actualGrade: course.actual_grade,
-      }
-    }, { status: 201 });
+    return NextResponse.json({ course }, { status: 201 });
   } catch (error) {
+    console.error('Add Course Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
