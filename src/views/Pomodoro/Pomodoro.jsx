@@ -170,14 +170,6 @@ class AmbientAudioEngine {
 
 const audioEngine = new AmbientAudioEngine();
 
-const PRESET_SUBJECTS = [
-  'Organic Chemistry',
-  'Calculus III',
-  'Data Structures',
-  'Quantum Physics',
-  'General Study'
-];
-
 export default function Pomodoro() {
   const toast = useToast();
   const { user } = useAuth();
@@ -188,8 +180,9 @@ export default function Pomodoro() {
   const [soundscape, setSoundscape] = useState('rain');
   const [soundPlaying, setSoundPlaying] = useState(false);
 
-  // Subject state
-  const [subject, setSubject] = useState('Organic Chemistry');
+  // Dynamic Subject state
+  const [availableSubjects, setAvailableSubjects] = useState(['General Study']);
+  const [subject, setSubject] = useState('General Study');
   const [customSubject, setCustomSubject] = useState('');
   const [isCustomMode, setIsCustomMode] = useState(false);
 
@@ -204,16 +197,16 @@ export default function Pomodoro() {
     longFocus: { label: 'Deep Focus (50m)', duration: 50 * 60, minutes: 50 }
   };
 
-  // 1. Fetch live focus metrics on mount
+  // 1. Fetch live focus metrics and real enrolled subjects on mount
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Fetch focus stats
     axios
-      .get('/api/focus', {
-        headers: { Authorization: `Bearer ${token}` },
-        timeout: 4000
-      })
+      .get('/api/focus', { headers, timeout: 6000 })
       .then((res) => {
         if (res.data) {
           setTodayMinutes(res.data.todayMinutes || 0);
@@ -223,6 +216,26 @@ export default function Pomodoro() {
       .catch((err) => {
         console.warn('Could not fetch live focus stats:', err.message);
       });
+
+    // Fetch user enrolled courses
+    axios
+      .get('/api/academics', { headers, timeout: 6000 })
+      .then((res) => {
+        const sems = res.data?.semesters || [];
+        const userCourses = [];
+        sems.forEach((s) => {
+          if (Array.isArray(s.courses)) {
+            s.courses.forEach((c) => {
+              if (!userCourses.includes(c.name)) userCourses.push(c.name);
+            });
+          }
+        });
+        if (userCourses.length > 0) {
+          setAvailableSubjects([...userCourses, 'General Study']);
+          setSubject(userCourses[0]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // 2. Soundscape audio handler
@@ -409,7 +422,7 @@ export default function Pomodoro() {
           </div>
 
           <div className="subject-pills-row">
-            {PRESET_SUBJECTS.map((s) => (
+            {availableSubjects.map((s) => (
               <button
                 key={s}
                 type="button"

@@ -1,35 +1,19 @@
 [
   {
-    "id": "sem_spring_2026",
-    "userId": "demo_user_123",
-    "name": "Spring 2026",
-    "startDate": "2026-02-01",
-    "endDate": "2026-06-30",
+    "id": "cef2f945-d0ae-4409-8a36-19d96b02e272",
+    "_id": "cef2f945-d0ae-4409-8a36-19d96b02e272",
+    "userId": "d5f0c9ff-46cb-4b53-9ad3-6f72b3de49fd",
+    "name": "Current Semester",
+    "startDate": "2026-09-13",
+    "endDate": "2027-01-11",
     "courses": [
       {
-        "id": "course_org_chem",
-        "semesterId": "sem_spring_2026",
-        "name": "Organic Chemistry",
-        "code": "CHEM-201",
-        "creditHours": 4,
-        "targetGrade": "A",
-        "actualGrade": ""
-      },
-      {
-        "id": "course_calc_3",
-        "semesterId": "sem_spring_2026",
-        "name": "Calculus III",
-        "code": "MATH-203",
+        "_id": "2fc3f7d9-5574-42ec-8fa3-3a6162f51357",
+        "id": "2fc3f7d9-5574-42ec-8fa3-3a6162f51357",
+        "semesterId": "cef2f945-d0ae-4409-8a36-19d96b02e272",
+        "name": "BIo",
+        "code": "dfgs",
         "creditHours": 3,
-        "targetGrade": "A",
-        "actualGrade": ""
-      },
-      {
-        "id": "course_dsa",
-        "semesterId": "sem_spring_2026",
-        "name": "Data Structures & Algorithms",
-        "code": "CS-210",
-        "creditHours": 4,
         "targetGrade": "A",
         "actualGrade": ""
       }

@@ -16,20 +16,6 @@ export async function POST(req) {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Quick demo student handler
-    if ((cleanEmail === 'demo@learnozi.com' || cleanEmail === 'demo') && (password === 'demo1234' || password === 'demo')) {
-      const demoUser = {
-        id: 'demo_user_123',
-        name: 'Demo Student',
-        email: 'demo@learnozi.com',
-        isOnboarded: true,
-        isVerified: true,
-        academicProfile: { educationLevel: 'University', university: 'NUST', institution: 'NUST' },
-      };
-      const token = signToken({ id: demoUser.id, email: demoUser.email });
-      return NextResponse.json({ token, user: demoUser });
-    }
-
     // Find user in store
     const user = await findUserByEmail(cleanEmail);
     if (!user) {

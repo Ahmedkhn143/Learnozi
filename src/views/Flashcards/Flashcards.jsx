@@ -385,15 +385,24 @@ export default function Flashcards() {
         </div>
       ) : (
         <div className="flashcards-empty-state">
-          <h3>No cards in this deck yet</h3>
-          <p>Use the AI Generator to quickly create smart cards for this subject.</p>
-          <button
-            type="button"
-            className="btn btn-primary btn-md mt-3"
-            onClick={() => setShowAiModal(true)}
-          >
-            ✨ Generate AI Flashcards
-          </button>
+          <h3>{decks.length === 0 ? 'No flashcard decks created yet' : 'No cards in this deck yet'}</h3>
+          <p>Create your custom deck or let AI generate smart flashcards with spaced repetition!</p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="btn btn-secondary btn-md"
+              onClick={() => setShowManualModal(true)}
+            >
+              + Create Manual Deck
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-md"
+              onClick={() => setShowAiModal(true)}
+            >
+              ✨ Generate AI Flashcards
+            </button>
+          </div>
         </div>
       )}
 

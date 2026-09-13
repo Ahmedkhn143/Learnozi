@@ -1,95 +1,44 @@
 [
   {
-    "id": "deck_org_chem_101",
-    "userId": "demo_user_123",
-    "title": "Organic Chemistry Reactions",
-    "subject": "Chemistry",
-    "progress": 60,
-    "isAIGenerated": false,
-    "createdAt": "2026-09-13T11:15:01.099Z",
+    "id": "098068be-6cda-440e-bae6-e0cb286efb42",
+    "userId": "d5f0c9ff-46cb-4b53-9ad3-6f72b3de49fd",
+    "title": "Ai in this era (AI Deck)",
+    "subject": "General",
     "cards": [
       {
         "id": 1,
-        "question": "What is the Markovnikov Rule in alkene electrophilic addition?",
-        "answer": "In the addition of HX to an unsymmetrical alkene, hydrogen attaches to the carbon with more hydrogens, forming the more stable carbocation intermediate.",
+        "question": "What is the core definition and foundational principle of Ai in this era?",
+        "answer": "Ai in this era refers to the foundational framework and core mechanisms governing key processes within General. Understanding its primary axioms is crucial for conceptual mastery and exam problem-solving.",
         "mastery": "Medium"
       },
       {
         "id": 2,
-        "question": "What differentiates SN1 and SN2 nucleophilic substitution reactions?",
-        "answer": "SN1 is a two-step mechanism via a planar carbocation intermediate (favored in tertiary substrates). SN2 is a concerted backside attack with stereochemical inversion (favored in primary substrates).",
-        "mastery": "Hard"
+        "question": "What are the primary components, variables, or stages involved in Ai in this era?",
+        "answer": "The primary components of Ai in this era include its initial conditions, active transformation phases, and resultant equilibrium states. Each element interacts systematically to produce observable outcomes.",
+        "mastery": "Medium"
       },
       {
         "id": 3,
-        "question": "What is the role of a Lewis Acid catalyst (like AlCl3) in Friedel-Crafts alkylation?",
-        "answer": "It acts as an electron pair acceptor to polarize or generate a potent carbocation electrophile from the alkyl halide.",
-        "mastery": "Easy"
+        "question": "What is the most common real-world application or scientific significance of Ai in this era?",
+        "answer": "In academic and industrial practice, Ai in this era is applied to optimize experimental efficiency, design scalable systems, and analyze complex behaviors in General.",
+        "mastery": "Medium"
       },
       {
         "id": 4,
-        "question": "What is Zaitsev's Rule in elimination reactions?",
-        "answer": "In β-elimination reactions, the major product is the more substituted, thermodynamically more stable alkene.",
-        "mastery": "Medium"
-      }
-    ]
-  },
-  {
-    "id": "deck_quantum_phys_201",
-    "userId": "demo_user_123",
-    "title": "Quantum Physics Principles",
-    "subject": "Physics",
-    "progress": 40,
-    "isAIGenerated": false,
-    "createdAt": "2026-09-13T11:15:01.099Z",
-    "cards": [
-      {
-        "id": 1,
-        "question": "What does Heisenberg’s Uncertainty Principle state?",
-        "answer": "It is impossible to simultaneously determine both the exact position and momentum of a subatomic particle (Δx · Δp ≥ ℏ/2).",
-        "mastery": "Easy"
-      },
-      {
-        "id": 2,
-        "question": "Explain the Photoelectric Effect and Einstein’s explanation.",
-        "answer": "Electrons are ejected from a metal surface only when light frequency exceeds a threshold (work function), proving that light behaves as quantized wave packets called photons (E = hf).",
+        "question": "What is a common misconception or typical pitfall students encounter when studying Ai in this era?",
+        "answer": "Students frequently confuse the underlying causality of Ai in this era with correlated secondary effects. Always verify boundary conditions and check governing equations before concluding.",
         "mastery": "Medium"
       },
       {
-        "id": 3,
-        "question": "What is Quantum Superposition?",
-        "answer": "A quantum system can exist in a linear combination of multiple distinct states simultaneously until a measurement is performed, collapsing the wave function.",
-        "mastery": "Hard"
+        "id": 5,
+        "question": "How does Ai in this era compare or contrast with adjacent topics in General?",
+        "answer": "While adjacent concepts focus on static conditions, Ai in this era specifically addresses dynamic interactions, energy transfers, and critical constraints in the domain.",
+        "mastery": "Medium"
       }
-    ]
-  },
-  {
-    "id": "deck_cs_algo_301",
-    "userId": "demo_user_123",
-    "title": "Data Structures & Algorithms",
-    "subject": "Computer Science",
-    "progress": 75,
+    ],
+    "cardCount": 5,
+    "progress": 0,
     "isAIGenerated": true,
-    "createdAt": "2026-09-13T11:15:01.099Z",
-    "cards": [
-      {
-        "id": 1,
-        "question": "What is the average and worst-case time complexity of QuickSort?",
-        "answer": "Average case is O(N log N). Worst case is O(N²) when poorly chosen pivots cause highly unbalanced partitions.",
-        "mastery": "Easy"
-      },
-      {
-        "id": 2,
-        "question": "Explain how Hash Tables achieve O(1) average lookup and how collisions are resolved.",
-        "answer": "A hash function computes an array index from a key. Collisions are handled via Chaining (linked lists) or Open Addressing (linear/quadratic probing).",
-        "mastery": "Easy"
-      },
-      {
-        "id": 3,
-        "question": "What is the primary difference between BFS and DFS traversal in graphs?",
-        "answer": "BFS uses a Queue to explore neighbors level-by-level (finds shortest unweighted paths). DFS uses a Stack/recursion to explore as deep as possible before backtracking.",
-        "mastery": "Medium"
-      }
-    ]
+    "createdAt": "2026-09-13T13:45:42.634Z"
   }
 ]

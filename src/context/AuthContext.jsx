@@ -15,23 +15,10 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    if (token === 'demo-mock-jwt-token-12345') {
-      setUser({
-        id: 'demo_user_123',
-        name: 'Demo Student',
-        email: 'demo@learnozi.com',
-        isOnboarded: true,
-        isVerified: true,
-        academicProfile: { educationLevel: 'University', university: 'NUST', institution: 'NUST' },
-      });
-      setLoading(false);
-      return;
-    }
-
     axios
       .get('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
-        timeout: 2500,
+        timeout: 5000,
       })
       .then((res) => setUser(res.data.user))
       .catch(() => {
@@ -113,21 +100,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const demoLogin = () => {
-    const demoData = {
-      id: 'demo_user_123',
-      name: 'Demo Student',
-      email: 'demo@learnozi.com',
-      isOnboarded: true,
-      isVerified: true,
-      academicProfile: { educationLevel: 'University', university: 'NUST', institution: 'NUST' },
-    };
-    localStorage.setItem('token', 'demo-mock-jwt-token-12345');
-    localStorage.setItem('user_data', JSON.stringify(demoData));
-    setUser(demoData);
-    return demoData;
-  };
-
   const googleLogin = async (googleUserData) => {
     try {
       const res = await axios.post('/api/auth/google', googleUserData);
@@ -169,7 +141,6 @@ export function AuthProvider({ children }) {
         resendCode,
         googleLogin,
         setAuthSession,
-        demoLogin,
         logout,
       }}
     >

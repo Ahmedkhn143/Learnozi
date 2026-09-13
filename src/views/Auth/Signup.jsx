@@ -151,8 +151,26 @@ export default function Signup() {
       <div className="minimal-ambient-glow signup-glow-1" />
       <div className="minimal-ambient-glow signup-glow-2" />
       <div className="minimal-ambient-glow signup-glow-3" />
+      <div className="minimal-ambient-glow signup-glow-4" />
+      
+      {/* Animated Aurora Wave Ribbon */}
+      <div className="minimal-aurora-ribbon" />
 
-      {/* Grid Mesh */}
+      {/* Floating Stardust Particles */}
+      <div className="cosmic-particles-wrap" aria-hidden="true">
+        <span className="cosmic-dot dot-1" />
+        <span className="cosmic-dot dot-2" />
+        <span className="cosmic-dot dot-3" />
+        <span className="cosmic-dot dot-4" />
+        <span className="cosmic-dot dot-5" />
+        <span className="cosmic-dot dot-6" />
+        <span className="cosmic-dot dot-7" />
+        <span className="cosmic-dot dot-8" />
+        <span className="cosmic-dot dot-9" />
+        <span className="cosmic-dot dot-10" />
+      </div>
+
+      {/* Animated Cyber Grid Mesh */}
       <div className="minimal-grid-overlay" />
 
       {/* Top Bar Language Switcher */}

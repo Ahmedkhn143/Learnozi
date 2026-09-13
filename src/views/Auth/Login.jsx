@@ -6,7 +6,7 @@ import GoogleAuthModal from '../../components/GoogleAuthModal/GoogleAuthModal';
 import './LoginMinimal.css';
 
 export default function Login() {
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
   const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
 
@@ -58,18 +58,6 @@ export default function Login() {
     }
   };
 
-  const handleDemoAccess = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await demoLogin();
-      setLoading(false);
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Demo login failed. Please try manual login.');
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="minimal-auth-page">
@@ -77,6 +65,24 @@ export default function Login() {
       <div className="minimal-ambient-glow glow-top-left" />
       <div className="minimal-ambient-glow glow-bottom-right" />
       <div className="minimal-ambient-glow glow-center" />
+      <div className="minimal-ambient-glow glow-accent-4" />
+
+      {/* Animated Aurora Wave Ribbon */}
+      <div className="minimal-aurora-ribbon" />
+
+      {/* Floating Stardust Particles */}
+      <div className="cosmic-particles-wrap" aria-hidden="true">
+        <span className="cosmic-dot dot-1" />
+        <span className="cosmic-dot dot-2" />
+        <span className="cosmic-dot dot-3" />
+        <span className="cosmic-dot dot-4" />
+        <span className="cosmic-dot dot-5" />
+        <span className="cosmic-dot dot-6" />
+        <span className="cosmic-dot dot-7" />
+        <span className="cosmic-dot dot-8" />
+        <span className="cosmic-dot dot-9" />
+        <span className="cosmic-dot dot-10" />
+      </div>
 
       {/* Subtle Mesh Grid */}
       <div className="minimal-grid-overlay" />
@@ -246,19 +252,6 @@ export default function Login() {
             <span>{loading ? 'Signing In...' : 'Sign In to Learnozi'}</span>
             <span style={{ fontSize: '1.1rem' }}>→</span>
           </button>
-
-          {/* Quick Demo Access Pill */}
-          <div className="minimal-demo-row">
-            <button
-              type="button"
-              className="btn-minimal-demo"
-              onClick={handleDemoAccess}
-              disabled={loading}
-            >
-              <span>⚡ Try Demo Student</span>
-              <span style={{ opacity: 0.6 }}>(1-Click)</span>
-            </button>
-          </div>
         </form>
 
         {/* Card Footer: Switch to Signup */}
