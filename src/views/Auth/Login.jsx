@@ -178,12 +178,7 @@ export default function Login() {
 
           {/* Password Field */}
           <div className="minimal-field-group">
-            <div className="minimal-label-row">
-              <label className="minimal-label">Password</label>
-              <Link to="/forgot-password" className="minimal-forgot-link">
-                Forgot password?
-              </Link>
-            </div>
+            <label className="minimal-label">Password</label>
             <div className="minimal-input-box">
               <span className="minimal-input-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -227,7 +222,7 @@ export default function Login() {
             )}
           </div>
 
-          {/* Options Row: Remember Me */}
+          {/* Options Row: Remember Me & Forgot Password */}
           <div className="minimal-options-row">
             <label className="minimal-checkbox-label">
               <input
@@ -235,8 +230,11 @@ export default function Login() {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <span>Remember this device</span>
+              <span>Remember me</span>
             </label>
+            <Link to="/forgot-password" className="minimal-forgot-link">
+              Forgot password?
+            </Link>
           </div>
 
           {/* Submit Button */}
