@@ -316,8 +316,8 @@ export default function Signup() {
                 </div>
               </div>
 
-              {/* Row 3: Education Level & Institution */}
-              <div className="signup-grid-2">
+              {/* Row 3: 3-Column Academic Details */}
+              <div className="signup-grid-3">
                 <div className="signup-field-wrap">
                   <label className="signup-label">Education Level</label>
                   <select
@@ -326,9 +326,9 @@ export default function Signup() {
                     onChange={(e) => setEducationLevel(e.target.value)}
                   >
                     <option value="University">University / College</option>
-                    <option value="FSc / A-Levels">FSc / Intermediate / A-Levels</option>
+                    <option value="FSc / A-Levels">FSc / Intermediate</option>
                     <option value="Matric / O-Levels">Matric / O-Levels</option>
-                    <option value="Self-Taught">Self-Taught / Professional</option>
+                    <option value="Self-Taught">Self-Taught / Other</option>
                   </select>
                 </div>
 
@@ -343,52 +343,52 @@ export default function Signup() {
                     <input
                       type="text"
                       className="signup-input"
-                      placeholder="e.g. NUST, FAST, Punjab Univ"
+                      placeholder="e.g. NUST, FAST"
                       value={institution}
                       onChange={(e) => setInstitution(e.target.value)}
                     />
                   </div>
                 </div>
+
+                <div className="signup-field-wrap">
+                  <label className="signup-label">Primary Field of Study</label>
+                  <select
+                    className="signup-select"
+                    value={interest}
+                    onChange={(e) => setInterest(e.target.value)}
+                  >
+                    <option value="Computer Science & IT">💻 Computer Science & IT</option>
+                    <option value="Pre-Medical & Health Sciences">🩺 Pre-Medical & Health</option>
+                    <option value="Engineering (Electrical / Mechanical)">⚡ Engineering Sciences</option>
+                    <option value="Business, Economics & Finance">📊 Business & Finance</option>
+                    <option value="General & High School Studies">📚 General Science</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Row 4: Field of Study / Interest */}
-              <div className="signup-field-wrap">
-                <label className="signup-label">Primary Field of Study</label>
-                <select
-                  className="signup-select"
-                  value={interest}
-                  onChange={(e) => setInterest(e.target.value)}
+              {/* Row 4: Action Bar (Terms on Left, Submit on Right) */}
+              <div className="signup-action-row">
+                <div className="signup-terms-row">
+                  <input
+                    type="checkbox"
+                    id="agreeTerms"
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                  />
+                  <label htmlFor="agreeTerms">
+                    I agree to Learnozi <Link to="/" style={{ color: '#818cf8' }}>Terms</Link> & <Link to="/" style={{ color: '#818cf8' }}>Privacy</Link>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn-signup-primary"
+                  disabled={loading}
                 >
-                  <option value="Computer Science & IT">💻 Computer Science & Software Engineering</option>
-                  <option value="Pre-Medical & Health Sciences">🩺 Pre-Medical & Biology</option>
-                  <option value="Engineering (Electrical / Mechanical)">⚡ Engineering & Physical Sciences</option>
-                  <option value="Business, Economics & Finance">📊 Business, Finance & Economics</option>
-                  <option value="General & High School Studies">📚 General Science & Humanities</option>
-                </select>
+                  <span>{loading ? 'Creating Account...' : 'Create Free Account'}</span>
+                  <span>→</span>
+                </button>
               </div>
-
-              {/* Terms Checkbox */}
-              <div className="signup-terms-row">
-                <input
-                  type="checkbox"
-                  id="agreeTerms"
-                  checked={agreeTerms}
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                />
-                <label htmlFor="agreeTerms">
-                  I agree to Learnozi <Link to="/" style={{ color: '#818cf8' }}>Terms</Link> & <Link to="/" style={{ color: '#818cf8' }}>Privacy Policy</Link>
-                </label>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="btn-signup-primary"
-                disabled={loading}
-              >
-                <span>{loading ? 'Creating Account...' : 'Create Free Account'}</span>
-                <span>→</span>
-              </button>
             </form>
 
             {/* Footer */}
