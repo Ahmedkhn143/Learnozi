@@ -28,10 +28,10 @@ export default function App() {
         {/* Landing page — accessible to all */}
         <Route path="/" element={<Landing />} />
 
-        {/* Auth pages — guests only */}
-        <Route path="/login"  element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
-        <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        {/* Auth pages */}
+        <Route path="/login"  element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Auth — public (no auth required) */}
         <Route path="/verify/:token" element={<VerifyEmail />} />

@@ -1,9 +1,25 @@
-'use client';
+import { ClientOnly } from './client';
 
-import dynamic from 'next/dynamic';
+export const dynamicParams = true;
 
-const AppSPA = dynamic(() => import('@/src/AppSPA'), { ssr: false });
+export function generateStaticParams() {
+  return [
+    { slug: [] },
+    { slug: ['login'] },
+    { slug: ['signup'] },
+    { slug: ['forgot-password'] },
+    { slug: ['dashboard'] },
+    { slug: ['academics'] },
+    { slug: ['planner'] },
+    { slug: ['flashcards'] },
+    { slug: ['pomodoro'] },
+    { slug: ['aiexplainer'] },
+    { slug: ['onboarding'] },
+    { slug: ['profile'] },
+    { slug: ['settings'] }
+  ];
+}
 
-export default function CatchAllSPA() {
-  return <AppSPA />;
+export default function Page() {
+  return <ClientOnly />;
 }
